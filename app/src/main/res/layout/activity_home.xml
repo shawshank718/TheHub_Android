@@ -1,0 +1,65 @@
+<android.support.v4.widget.DrawerLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/drawer_layout"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:fitsSystemWindows="true">
+
+    <RelativeLayout
+        android:id="@+id/main_content"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        tools:context="com.group6.thehub.activities.HomeActivity">
+
+        <ImageView
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:id="@+id/imgTint"
+            android:src="@color/black_55"
+            android:visibility="gone"
+            android:layout_centerVertical="true"
+            android:layout_centerHorizontal="true" />
+
+        <com.quinny898.library.persistentsearch.SearchBox
+            android:layout_width="wrap_content"
+            android:id="@+id/searchbox"
+            android:layout_height="wrap_content"
+            android:visibility="gone"
+            android:layout_marginTop="6dp"
+            android:layout_marginLeft="6dp"
+            android:layout_marginRight="6dp"
+            android:layout_alignParentLeft="true"
+            android:layout_alignParentTop="true" />
+
+        <include android:id="@+id/appBar"
+            layout="@layout/toolbar" />
+
+
+
+
+
+
+    </RelativeLayout>
+
+    <android.support.design.widget.NavigationView
+        android:id="@+id/navigation_view"
+        android:layout_height="match_parent"
+        android:layout_width="wrap_content"
+        android:layout_gravity="start"
+        app:headerLayout="@layout/drawer_header"
+        app:itemTextColor="@color/black_85"
+        app:menu = "@menu/drawer"/>
+
+    <!--<fragment-->
+        <!--android:id="@+id/fragment_navigation_drawer"-->
+        <!--android:layout_width="320dp"-->
+        <!--android:layout_height="match_parent"-->
+        <!--android:layout_gravity = "start"-->
+        <!--app:layout = "@layout/fragment_navigation_drawer"-->
+        <!--android:name="com.group6.thehub.fragments.NavigationDrawerFragment"-->
+        <!--tools:layout = "@layout/fragment_navigation_drawer" />-->
+
+</android.support.v4.widget.DrawerLayout>
+
+

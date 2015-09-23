@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <group
+        android:id="@+id/grp1"
+        android:checkableBehavior="single">
+
+        <item
+            android:id="@+id/profile"
+            android:checked="false"
+            android:icon="@drawable/ic_person_black_24dp"
+            android:title="@string/profile" />
+
+        <item
+            android:id="@+id/sessions"
+            android:checked="false"
+            android:icon="@drawable/ic_local_library_black_24dp"
+            android:title="@string/my_sessions" />
+
+        <item
+            android:id="@+id/settings"
+            android:checked="false"
+            android:icon="@drawable/ic_settings_black_24dp"
+            android:title="@string/settings" />
+
+
+    </group>
+
+    <group
+        android:id="@+id/grp2"
+        android:checkableBehavior="single">
+
+        <item
+            android:id="@+id/logout"
+            android:checked="false"
+            android:title="@string/logout" />
+
+
+    </group>
+
+
+</menu>
