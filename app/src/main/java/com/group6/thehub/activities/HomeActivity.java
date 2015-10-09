@@ -88,7 +88,6 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
         tvName.setText(userDetails.getFirstName() + " " + userDetails.getLastName());
         Picasso.with(this)
                 .load(AppHelper.END_POINT+userDetails.getImage().getImageUrl())
-                .resize(AppHelper.dipToPixels(this,76), AppHelper.dipToPixels(this,76))
                 .placeholder(R.drawable.circle_placeholder_76dp)
                 .error(R.drawable.circle_placeholder_76dp)
                 .into(profileImgView);
