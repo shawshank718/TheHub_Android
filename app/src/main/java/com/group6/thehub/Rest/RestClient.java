@@ -19,7 +19,7 @@ public class RestClient {
 
     public final TheHubApi theHubApi;
 
-    private final String baseUrl = "http://10.19.94.42/";
+    private final String baseUrl = "http://10.19.90.100/";
 
     public RestClient(@NonNull Context context) {
         this.mContext = context.getApplicationContext();
