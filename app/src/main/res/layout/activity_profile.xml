@@ -4,6 +4,7 @@
     android:layout_height="match_parent"
     android:fitsSystemWindows="true">
 
+
     <include layout="@layout/profile_scroll_view"/>
 
     <android.support.design.widget.AppBarLayout
@@ -16,7 +17,7 @@
         <android.support.design.widget.CollapsingToolbarLayout
             android:id="@+id/collapsing_toolbar"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
+            android:layout_height="match_parent"
             android:fitsSystemWindows="true"
             app:contentScrim="@color/primary_color"
             app:layout_scrollFlags="scroll|exitUntilCollapsed">
@@ -30,11 +31,11 @@
                 <com.group6.thehub.views.AspectRatioImageView
                     android:id="@+id/header"
                     android:layout_width="match_parent"
-                    android:layout_height="match_parent"
+                    android:layout_height="0dp"
                     android:scaleType="centerCrop"
                     android:src="@drawable/bg_signup_signin"
                     app:ratioX="1"
-                    app:ratioY="1" />
+                    app:ratioY="1"/>
 
                 <ImageView
                     android:id="@+id/img_edit"
@@ -52,10 +53,12 @@
                 android:layout_width="match_parent"
                 android:layout_height="?attr/actionBarSize"
                 app:layout_collapseMode="pin"
-                app:popupTheme="@style/ThemeOverlay.AppCompat.Light" />
+                android:elevation="6dp"
+                app:contentInsetStart="@dimen/second_keyline"
+                android:theme="@style/ActionbarThemeOverlay"
+                android:background="@android:color/transparent"/>
 
         </android.support.design.widget.CollapsingToolbarLayout>
     </android.support.design.widget.AppBarLayout>
-
 
 </android.support.design.widget.CoordinatorLayout>

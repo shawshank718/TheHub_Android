@@ -34,7 +34,7 @@ public class ProfileActivity extends AppCompatActivity implements UserResponse.I
 
     private UserDetails userDetails;
 
-    private final int GALLERY_ACTIVITY_CODE=200;
+    private final int GALLERY_ACTIVITY_CODE = 200;
 
     private final int RESULT_CROP = 400;
 
@@ -56,6 +56,9 @@ public class ProfileActivity extends AppCompatActivity implements UserResponse.I
         collapsingToolbarLayout = (CollapsingToolbarLayout) findViewById(R.id.collapsing_toolbar);
         collapsingToolbarLayout.setTitle(userDetails.getFirstName()+ " " +userDetails.getLastName());
 
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        getSupportActionBar().setDisplayShowHomeEnabled(true);
+
 //        Intent gallery_Intent = new Intent(getApplicationContext(), GalleryUtil.class);
 //        startActivityForResult(gallery_Intent, GALLERY_ACTIVITY_CODE);
 
@@ -65,6 +68,7 @@ public class ProfileActivity extends AppCompatActivity implements UserResponse.I
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
         getMenuInflater().inflate(R.menu.menu_profile, menu);
+
         return true;
     }
 
@@ -75,12 +79,21 @@ public class ProfileActivity extends AppCompatActivity implements UserResponse.I
         // as you specify a parent activity in AndroidManifest.xml.
         int id = item.getItemId();
 
-        //noinspection SimplifiableIfStatement
-        if (id == R.id.action_settings) {
-            return true;
+        if (id==android.R.id.home) {
+           goBack();
         }
 
         return super.onOptionsItemSelected(item);
+    }
+
+    private void goBack() {
+        finish();
+        overridePendingTransition(0,R.anim.push_right_out);
+    }
+
+    @Override
+    public void onBackPressed() {
+        goBack();
     }
 
     @Override

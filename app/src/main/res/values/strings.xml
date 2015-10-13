@@ -35,4 +35,6 @@
     <string name="title_activity_profile">ProfileActivity</string>
     <string name="qualification">Qualification</string>
     <string name="placeholder_qual">Master of Professional Engineering (Software)</string>
+    <string name="courses">Courses</string>
+    <string name="placeholder_course">MATH1001: Differential Calculus</string>
 </resources>
