@@ -13,12 +13,22 @@ import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
+import android.widget.AutoCompleteTextView;
+import android.widget.EditText;
+import android.widget.ImageButton;
+import android.widget.LinearLayout;
+import android.widget.TextView;
 import android.widget.Toast;
 
+import com.group6.thehub.AppHelper;
 import com.group6.thehub.R;
 import com.group6.thehub.Rest.models.UserDetails;
 import com.group6.thehub.Rest.responses.UserResponse;
+import com.group6.thehub.views.AspectRatioImageView;
 import com.squareup.picasso.Picasso;
+
+import org.w3c.dom.Text;
 
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -44,6 +54,16 @@ public class ProfileActivity extends AppCompatActivity implements UserResponse.I
 
     public String finalPath = "";
 
+    private AspectRatioImageView imgHeader;
+    private ImageButton imgEdit;
+    private TextView tvQualValue;
+    private EditText etQualValue;
+    private LinearLayout lilyCourses;
+    private AutoCompleteTextView etCourseValue;
+
+    private String qualification;
+    private boolean inEditMode;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -59,6 +79,15 @@ public class ProfileActivity extends AppCompatActivity implements UserResponse.I
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         getSupportActionBar().setDisplayShowHomeEnabled(true);
 
+        imgHeader = (AspectRatioImageView) findViewById(R.id.img_header);
+        imgEdit = (ImageButton) findViewById(R.id.img_edit);
+        tvQualValue = (TextView) findViewById(R.id.tvQualValue);
+        etQualValue = (EditText) findViewById(R.id.etQualValue);
+        lilyCourses = (LinearLayout) findViewById(R.id.lilyCourses);
+        etCourseValue = (AutoCompleteTextView) findViewById(R.id.etCourseValue);
+
+        Picasso.with(this).load(AppHelper.END_POINT+userDetails.getImage().getImageUrl()).placeholder(R.drawable.bg_signup_signin).error(R.drawable.bg_signup_signin).into(imgHeader);
+
 //        Intent gallery_Intent = new Intent(getApplicationContext(), GalleryUtil.class);
 //        startActivityForResult(gallery_Intent, GALLERY_ACTIVITY_CODE);
 
@@ -73,6 +102,16 @@ public class ProfileActivity extends AppCompatActivity implements UserResponse.I
     }
 
     @Override
+    public boolean onPrepareOptionsMenu(Menu menu) {
+        if (inEditMode) {
+            menu.getItem(0).setVisible(false);
+            menu.getItem(1).setVisible(false);
+            menu.getItem(2).setVisible(true);
+        }
+        return true;
+    }
+
+    @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         // Handle action bar item clicks here. The action bar will
         // automatically handle clicks on the Home/Up button, so long
@@ -83,7 +122,22 @@ public class ProfileActivity extends AppCompatActivity implements UserResponse.I
            goBack();
         }
 
+        if (id == R.id.action_edit) {
+            showEditMode();
+        }
+
         return super.onOptionsItemSelected(item);
+    }
+
+    private void showEditMode() {
+        inEditMode = true;
+        invalidateOptionsMenu();
+        qualification = tvQualValue.getText().toString();
+        imgEdit.setVisibility(View.VISIBLE);
+        tvQualValue.setVisibility(View.GONE);
+        etQualValue.setVisibility(View.VISIBLE);
+        etQualValue.setText(qualification);
+        etCourseValue.setVisibility(View.VISIBLE);
     }
 
     private void goBack() {
