@@ -47,4 +47,8 @@ In venenatis at ante sit amet consequat. Aliquam maximus blandit velit eu volutp
 
 Aenean non cursus est. Fusce feugiat ex at suscipit suscipit. In tempus magna sed dolor cursus pulvinar eget vel lacus. Phasellus vulputate aliquam ipsum, ac euismod est euismod eget. Nam laoreet justo eget auctor efficitur. Fusce sit amet porta felis. Pellentesque tempor mi est. Aliquam sit amet mauris in justo vestibulum blandit. Nullam metus risus, tristique a libero non, ullamcorper suscipit libero. Pellentesque habitant morbi tristique senectus et netus et malesuada fames ac turpis egestas. Donec vehicula commodo odio, eu sodales urna vestibulum nec. Aenean vulputate arcu facilisis sem eleifend sollicitudin. Pellentesque ut dui magna. Phasellus sodales nisi vitae ligula aliquet accumsan eu non nisl. Suspendisse et nisl maximus, vulputate magna et, aliquam ligula.</string>
     <string name="action_save">SAVE</string>
+    <string name="languages">Languages</string>
+    <string name="contact">Contact</string>
+    <string name="phone">Phone</string>
+    <string name="req_session">REQUEST SESSION</string>
 </resources>

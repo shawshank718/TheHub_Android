@@ -21,24 +21,20 @@
             android:layout_centerVertical="true"
             android:layout_centerHorizontal="true" />
 
+        <include android:id="@+id/appBar"
+            layout="@layout/toolbar" />
+
         <com.quinny898.library.persistentsearch.SearchBox
             android:layout_width="wrap_content"
             android:id="@+id/searchbox"
             android:layout_height="wrap_content"
             android:visibility="gone"
-            android:layout_marginTop="6dp"
-            android:layout_marginLeft="6dp"
-            android:layout_marginRight="6dp"
+            android:layout_marginTop="-6dp"
+            android:layout_marginLeft="-6dp"
+            android:layout_marginRight="-6dp"
             android:layout_alignParentLeft="true"
-            android:layout_alignParentTop="true" />
-
-        <include android:id="@+id/appBar"
-            layout="@layout/toolbar" />
-
-
-
-
-
+            android:layout_alignParentTop="true"
+            android:elevation = "8dp"/>
 
     </RelativeLayout>
 

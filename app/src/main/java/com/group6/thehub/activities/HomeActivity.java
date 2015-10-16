@@ -1,28 +1,18 @@
 package com.group6.thehub.activities;
 
-import android.content.ActivityNotFoundException;
 import android.content.Intent;
-import android.graphics.Bitmap;
-import android.net.Uri;
 import android.os.Bundle;
-import android.os.Environment;
-import android.os.Handler;
-import android.provider.MediaStore;
 import android.support.design.widget.NavigationView;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.view.animation.Animation;
 import android.widget.ImageView;
 import android.widget.TextView;
-import android.widget.Toast;
-
 import com.group6.thehub.AppHelper;
 import com.group6.thehub.R;
 import com.group6.thehub.Rest.models.UserDetails;
@@ -31,13 +21,8 @@ import com.quinny898.library.persistentsearch.SearchBox;
 import com.quinny898.library.persistentsearch.SearchResult;
 import com.squareup.picasso.Picasso;
 
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.IOException;
-
 
 import de.hdodenhof.circleimageview.CircleImageView;
-import retrofit.mime.TypedFile;
 
 
 public class HomeActivity extends AppCompatActivity implements View.OnClickListener{
@@ -59,9 +44,10 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
 
     private  Toolbar toolbar;
 
-    private SearchBox search;
+    private SearchBox searchBox;
 
     private ImageView imgTint;
+    private boolean isSearchOpened;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -69,7 +55,7 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
         setContentView(R.layout.activity_home);
         toolbar = (Toolbar) findViewById(R.id.appBar);
         setSupportActionBar(toolbar);
-        search = (SearchBox) findViewById(R.id.searchbox);
+        searchBox = (SearchBox) findViewById(R.id.searchbox);
         setUpSearchBox();
         imgTint = (ImageView) findViewById(R.id.imgTint);
         userDetails = UserResponse.getUserDetails(this);
@@ -108,6 +94,7 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
 
                     case R.id.profile:
                         intent = new Intent(getApplicationContext(), ProfileActivity.class);
+                        intent.putExtra("userId", userDetails.getUserId());
                         AppHelper.slideInStayStill(intent);
                         return true;
                     case R.id.logout:
@@ -183,9 +170,10 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
     }
 
     public void setUpSearchBox() {
-        search.setSearchListener(new SearchBox.SearchListener() {
+        searchBox.setSearchListener(new SearchBox.SearchListener() {
             @Override
             public void onSearchOpened() {
+                isSearchOpened = true;
                 imgTint.setVisibility(View.VISIBLE);
             }
 
@@ -196,6 +184,7 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
 
             @Override
             public void onSearchClosed() {
+                isSearchOpened = false;
                 closeSearch();
             }
 
@@ -212,24 +201,16 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
     }
 
     protected void closeSearch() {
-        search.hideCircularly(this);
-        Handler handler = new Handler();
-        handler.postDelayed(new Runnable() {
-            @Override
-            public void run() {
-                imgTint.setVisibility(View.GONE);
-                toolbar.setVisibility(View.VISIBLE);
-            }
-        }, 500);
+        searchBox.hideCircularly(this);
+        imgTint.setVisibility(View.GONE);
     }
 
     public void openSearch() {
-        toolbar.setVisibility(View.GONE);
-        search.revealFromMenuItem(R.id.action_search, this);
+        searchBox.revealFromMenuItem(R.id.action_search, this);
         for (int x = 0; x < 10; x++) {
             SearchResult option = new SearchResult("Result "
                     + Integer.toString(x), ContextCompat.getDrawable(this, R.drawable.ic_history_black_24dp));
-            search.addSearchable(option);
+            searchBox.addSearchable(option);
         }
     }
 
@@ -239,8 +220,4 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
 
         }
     }
-
-
-
-
 }

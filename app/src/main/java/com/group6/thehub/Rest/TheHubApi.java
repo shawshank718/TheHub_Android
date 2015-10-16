@@ -2,6 +2,9 @@ package com.group6.thehub.Rest;
 
 import com.group6.thehub.Rest.responses.BaseResponse;
 import com.group6.thehub.Rest.responses.UserResponse;
+
+import java.util.Map;
+
 import retrofit.Callback;
 import retrofit.http.Body;
 import retrofit.http.Field;
@@ -13,6 +16,7 @@ import retrofit.http.PUT;
 import retrofit.http.Part;
 import retrofit.http.Path;
 import retrofit.http.Query;
+import retrofit.http.QueryMap;
 import retrofit.mime.TypedFile;
 
 /**
@@ -32,5 +36,11 @@ public interface TheHubApi {
     @Multipart
     @POST("/theHub/upload.php")
     void uploadImage(@Part("image") TypedFile image, @Part("userId") long userId,  Callback<UserResponse> response );
+
+    @GET("/theHub/getDetails.php")
+    void getUserDetails(@Query("id") int userId, Callback<UserResponse> resoponse);
+
+    @GET("/theHub/getUserDetails.php")
+    void getUserDetails(@QueryMap Map<String, String> params, Callback<UserResponse> resoponse);
 
 }

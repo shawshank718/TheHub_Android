@@ -19,9 +19,11 @@ import retrofit.mime.TypedFile;
  */
 public class UserResponse extends BaseResponse {
 
-    public static UserResponseListener responseListener;
+    public static UserVerificationListener verificationListener;
 
     public static  ImageUploadResponseListener imageUploadResponseListener;
+
+    public static UserDetailsQueryListener userDetailsQueryListener;
 
     public UserDetails details;
 
@@ -38,18 +40,17 @@ public class UserResponse extends BaseResponse {
         progress.setMessage("Creating an account. Please Wait");
         progress.setIndeterminate(true);
         progress.show();
-        responseListener = (UserResponseListener) context;
+        verificationListener = (UserVerificationListener) context;
         RestClient restClient = new RestClient(context);
         restClient.theHubApi.registerUser(firstName, lastName, email, password, type, time, new Callback<UserResponse>() {
             @Override
             public void success(UserResponse userResponse, Response response) {
                 if (userResponse.getMeta().isSuccess()) {
-                    responseListener.onRegistrationComplete(userResponse.getDetails());
-                    progress.dismiss();
+                    verificationListener.onRegistrationComplete(userResponse.getDetails());
                 } else {
-                    responseListener.onFail(userResponse.getMeta().getMessage());
-                    progress.dismiss();
+                    verificationListener.onFail(userResponse.getMeta().getMessage());
                 }
+                progress.dismiss();
             }
 
             @Override
@@ -65,18 +66,44 @@ public class UserResponse extends BaseResponse {
         progress.setMessage("Logging in. Please Wait");
         progress.setIndeterminate(true);
         progress.show();
-        responseListener = (UserResponseListener) context;
+        verificationListener = (UserVerificationListener) context;
         RestClient restClient = new RestClient(context);
         restClient.theHubApi.loginUser(email, password, new Callback<UserResponse>() {
             @Override
             public void success(UserResponse userResponse, Response response) {
                 if (userResponse.getMeta().isSuccess()) {
-                    responseListener.onSignInComplete(userResponse.getDetails());
-                    progress.dismiss();
+                    verificationListener.onSignInComplete(userResponse.getDetails());
                 } else {
-                    responseListener.onFail(userResponse.getMeta().getMessage());
-                    progress.dismiss();
+                    verificationListener.onFail(userResponse.getMeta().getMessage());
                 }
+
+                progress.dismiss();
+            }
+
+            @Override
+            public void failure(RetrofitError error) {
+                progress.dismiss();
+            }
+        });
+    }
+
+    public static void retrieveUserDetails(Context context, int userId) {
+        final ProgressDialog progress = new ProgressDialog(context);
+        progress.setMessage("Loading information. Please Wait");
+        progress.setIndeterminate(true);
+        progress.show();
+        userDetailsQueryListener = (UserDetailsQueryListener) context;
+        RestClient restClient = new RestClient(context);
+        restClient.theHubApi.getUserDetails(userId, new Callback<UserResponse>() {
+            @Override
+            public void success(UserResponse userResponse, Response response) {
+                if (userResponse.getMeta().isSuccess()) {
+                    userDetailsQueryListener.onDetailsRetrieved(userResponse.getDetails());
+                } else {
+                    userDetailsQueryListener.onDetailsRetrieveFail(userResponse.getMeta().getMessage());
+                }
+                progress.dismiss();
+
             }
 
             @Override
@@ -100,7 +127,7 @@ public class UserResponse extends BaseResponse {
                     imageUploadResponseListener.onImageUpload(userResponse.getDetails());
                     progress.dismiss();
                 } else {
-                    imageUploadResponseListener.onFail(userResponse.getMeta().getMessage());
+                    imageUploadResponseListener.onUploadFail(userResponse.getMeta().getMessage());
                     progress.dismiss();
                 }
             }
@@ -143,23 +170,28 @@ public class UserResponse extends BaseResponse {
     }
 
     public static void callLogout(Context context) {
-        SharedPreferences prefs = context.getSharedPreferences("userDetails", Context.MODE_PRIVATE );
+        SharedPreferences prefs = context.getSharedPreferences("userDetails", Context.MODE_PRIVATE);
         SharedPreferences.Editor editor = prefs.edit();
         editor.clear();
         editor.commit();
     }
 
-    public interface UserResponseListener {
+
+
+    public interface UserVerificationListener {
         public void onRegistrationComplete(UserDetails userDetails);
         public void onSignInComplete(UserDetails userDetails);
-        public void onImageUpload(UserDetails userDetails);
         public void onFail(String message);
     }
 
     public interface  ImageUploadResponseListener {
         public void onImageUpload(UserDetails userDetails);
-        public void onFail(String message);
+        public void onUploadFail(String message);
     }
 
+    public interface UserDetailsQueryListener {
+        public void onDetailsRetrieved(UserDetails userDetails);
+        public void onDetailsRetrieveFail(String message);
+    }
 
 }

@@ -2,6 +2,8 @@ package com.group6.thehub.Rest.models;
 
 import org.parceler.Parcel;
 
+import java.util.ArrayList;
+
 /**
  * Created by sathwiksingari on 9/17/15.
  */
@@ -9,18 +11,27 @@ import org.parceler.Parcel;
 @Parcel
 public class UserDetails {
 
-    long userId;
+    int userId;
     String firstName;
     String lastName;
     String email;
     String type;
     ImageDetails image;
+    String qualification;
+    int star5;
+    int star4;
+    int star3;
+    int star2;
+    int star1;
+    float rating;
+    ArrayList<Language> languages;
+    ArrayList<Course> courses;
 
-    public long getUserId() {
+    public int getUserId() {
         return userId;
     }
 
-    public void setUserId(long userId) {
+    public void setUserId(int userId) {
         this.userId = userId;
     }
 
@@ -67,4 +78,75 @@ public class UserDetails {
         this.image = image;
     }
 
+    public String getQualification() {
+        return qualification;
+    }
+
+    public void setQualification(String qualification) {
+        this.qualification = qualification;
+    }
+
+    public int getStar5() {
+        return star5;
+    }
+
+    public void setStar5(int star5) {
+        this.star5 = star5;
+    }
+
+    public int getStar4() {
+        return star4;
+    }
+
+    public void setStar4(int star4) {
+        this.star4 = star4;
+    }
+
+    public int getStar3() {
+        return star3;
+    }
+
+    public void setStar3(int star3) {
+        this.star3 = star3;
+    }
+
+    public int getStar2() {
+        return star2;
+    }
+
+    public void setStar2(int star2) {
+        this.star2 = star2;
+    }
+
+    public int getStar1() {
+        return star1;
+    }
+
+    public void setStar1(int star1) {
+        this.star1 = star1;
+    }
+
+    public float getRating() {
+        return rating;
+    }
+
+    public void setRating(float rating) {
+        this.rating = rating;
+    }
+
+    public ArrayList<Language> getLanguages() {
+        return languages;
+    }
+
+    public void setLanguages(ArrayList<Language> languages) {
+        this.languages = languages;
+    }
+
+    public ArrayList<Course> getCourses() {
+        return courses;
+    }
+
+    public void setCourses(ArrayList<Course> courses) {
+        this.courses = courses;
+    }
 }

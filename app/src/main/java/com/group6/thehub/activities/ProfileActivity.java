@@ -11,6 +11,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
+import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -18,11 +19,14 @@ import android.widget.AutoCompleteTextView;
 import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.LinearLayout;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import com.group6.thehub.AppHelper;
 import com.group6.thehub.R;
+import com.group6.thehub.Rest.models.Course;
+import com.group6.thehub.Rest.models.Language;
 import com.group6.thehub.Rest.models.UserDetails;
 import com.group6.thehub.Rest.responses.UserResponse;
 import com.group6.thehub.views.AspectRatioImageView;
@@ -33,10 +37,11 @@ import org.w3c.dom.Text;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.util.ArrayList;
 
 import retrofit.mime.TypedFile;
 
-public class ProfileActivity extends AppCompatActivity implements UserResponse.ImageUploadResponseListener {
+public class ProfileActivity extends AppCompatActivity implements UserResponse.ImageUploadResponseListener, View.OnClickListener, UserResponse.UserDetailsQueryListener {
 
     private Toolbar toolbar;
 
@@ -60,9 +65,18 @@ public class ProfileActivity extends AppCompatActivity implements UserResponse.I
     private EditText etQualValue;
     private LinearLayout lilyCourses;
     private AutoCompleteTextView etCourseValue;
+    private LinearLayout lilyLanguages;
+    private AutoCompleteTextView etLangValue;
+    private TextView tvPhoneValue;
+    private EditText etPhoneValue;
+    private TextView tvEmailValue;
+    private EditText etEmailValue;
 
     private String qualification;
+    private String email;
+    private String phone;
     private boolean inEditMode;
+    private boolean isMine = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -73,8 +87,18 @@ public class ProfileActivity extends AppCompatActivity implements UserResponse.I
         setSupportActionBar(toolbar);
 
         userDetails = UserResponse.getUserDetails(this);
+
+        int userId = getIntent().getIntExtra("userId", -1);
+        if (userId == userDetails.getUserId()) {
+            isMine =true;
+            invalidateOptionsMenu();
+        } else {
+            UserResponse.retrieveUserDetails(this, userId);
+        }
+
+
         collapsingToolbarLayout = (CollapsingToolbarLayout) findViewById(R.id.collapsing_toolbar);
-        collapsingToolbarLayout.setTitle(userDetails.getFirstName()+ " " +userDetails.getLastName());
+        collapsingToolbarLayout.setTitle(userDetails.getFirstName() + " " + userDetails.getLastName());
 
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         getSupportActionBar().setDisplayShowHomeEnabled(true);
@@ -85,12 +109,90 @@ public class ProfileActivity extends AppCompatActivity implements UserResponse.I
         etQualValue = (EditText) findViewById(R.id.etQualValue);
         lilyCourses = (LinearLayout) findViewById(R.id.lilyCourses);
         etCourseValue = (AutoCompleteTextView) findViewById(R.id.etCourseValue);
+        lilyLanguages = (LinearLayout) findViewById(R.id.lilyLanguages);
+        etLangValue = (AutoCompleteTextView) findViewById(R.id.etLangValue);
+        tvPhoneValue = (TextView) findViewById(R.id.tvPhoneValue);
+        etPhoneValue = (EditText) findViewById(R.id.etPhoneValue);
+        tvEmailValue = (TextView) findViewById(R.id.tvEmailValue);
+        etEmailValue = (EditText) findViewById(R.id.etEmailValue);
 
+        imgEdit.setOnClickListener(this);
+
+        setupDetails(userDetails);
+
+    }
+
+    private void setupDetails(UserDetails userDetails) {
+        Picasso.with(this).setLoggingEnabled(true);
         Picasso.with(this).load(AppHelper.END_POINT+userDetails.getImage().getImageUrl()).placeholder(R.drawable.bg_signup_signin).error(R.drawable.bg_signup_signin).into(imgHeader);
+        if (userDetails.getQualification() == null) {
+            tvQualValue.setVisibility(View.GONE);
+        } else {
+            tvQualValue.setText(userDetails.getQualification());
+        }
+        addLanguages(userDetails.getLanguages());
+        addCourses(userDetails.getCourses());
+        tvEmailValue.setText(userDetails.getEmail());
+    }
 
-//        Intent gallery_Intent = new Intent(getApplicationContext(), GalleryUtil.class);
-//        startActivityForResult(gallery_Intent, GALLERY_ACTIVITY_CODE);
+    private void addCourses(ArrayList<Course> courses) {
+        if (!courses.isEmpty()) {
 
+            for (Course course: courses) {
+                addCourseItem(course);
+            }
+        }
+    }
+
+    private void addCourseItem(Course course) {
+        LayoutInflater inflater = getLayoutInflater();
+        View view = inflater.inflate(R.layout.course_item, lilyCourses, false);
+        CourseItemViewHolder holder = new CourseItemViewHolder();
+        holder.tvItemValue = (TextView) view.findViewById(R.id.tvItemValue);
+        holder.imgClear = (ImageButton) view.findViewById(R.id.imgClear);
+        holder.imgClear.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Log.d("ProfileActivity", "clear Clicked");
+                lilyCourses.removeView((View) v.getParent());
+            }
+        });
+        if (inEditMode) {
+            holder.imgClear.setVisibility(View.VISIBLE);
+        }
+        holder.tvItemValue.setText(course.getCourseCode()+": "+course.getCourseName());
+        view.setTag(holder);
+        lilyCourses.addView(view);
+    }
+
+    private void addLanguages(ArrayList<Language> languages) {
+        if (!languages.isEmpty()) {
+
+            for (Language language: languages) {
+                addLanguageItem(language);
+            }
+        }
+    }
+
+    private void addLanguageItem(Language language) {
+        LayoutInflater inflater = getLayoutInflater();
+        View view = inflater.inflate(R.layout.course_item, lilyCourses, false);
+        CourseItemViewHolder holder = new CourseItemViewHolder();
+        holder.tvItemValue = (TextView) view.findViewById(R.id.tvItemValue);
+        holder.imgClear = (ImageButton) view.findViewById(R.id.imgClear);
+        holder.imgClear.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Log.d("ProfileActivity", "clear Clicked");
+                lilyLanguages.removeView((View) v.getParent());
+            }
+        });
+        if (inEditMode) {
+            holder.imgClear.setVisibility(View.VISIBLE);
+        }
+        holder.tvItemValue.setText(language.getEnglishName());
+        view.setTag(holder);
+        lilyLanguages.addView(view);
     }
 
     @Override
@@ -103,11 +205,27 @@ public class ProfileActivity extends AppCompatActivity implements UserResponse.I
 
     @Override
     public boolean onPrepareOptionsMenu(Menu menu) {
+
+        if (isMine) {
+            menu.getItem(0).setVisible(false);
+            menu.getItem(1).setVisible(true);
+            menu.getItem(2).setVisible(false);
+        } else {
+            menu.getItem(0).setVisible(true);
+            menu.getItem(1).setVisible(false);
+            menu.getItem(2).setVisible(false);
+            return true;
+        }
+
         if (inEditMode) {
             menu.getItem(0).setVisible(false);
             menu.getItem(1).setVisible(false);
             menu.getItem(2).setVisible(true);
+            return true;
         }
+
+
+
         return true;
     }
 
@@ -132,12 +250,33 @@ public class ProfileActivity extends AppCompatActivity implements UserResponse.I
     private void showEditMode() {
         inEditMode = true;
         invalidateOptionsMenu();
+
         qualification = tvQualValue.getText().toString();
+        phone = tvPhoneValue.getText().toString();
+        email = tvEmailValue.getText().toString();
+
         imgEdit.setVisibility(View.VISIBLE);
         tvQualValue.setVisibility(View.GONE);
         etQualValue.setVisibility(View.VISIBLE);
         etQualValue.setText(qualification);
+        for (int i = 0; i < lilyCourses.getChildCount(); i++) {
+            View view = lilyCourses.getChildAt(i);
+            CourseItemViewHolder holder = (CourseItemViewHolder) view.getTag();
+            holder.imgClear.setVisibility(View.VISIBLE);
+        }
         etCourseValue.setVisibility(View.VISIBLE);
+        for (int i = 0; i < lilyLanguages.getChildCount(); i++) {
+            View view = lilyLanguages.getChildAt(i);
+            CourseItemViewHolder holder = (CourseItemViewHolder) view.getTag();
+            holder.imgClear.setVisibility(View.VISIBLE);
+        }
+        etLangValue.setVisibility(View.VISIBLE);
+        tvPhoneValue.setVisibility(View.GONE);
+        tvEmailValue.setVisibility(View.GONE);
+        etPhoneValue.setVisibility(View.VISIBLE);
+        etPhoneValue.setText(phone);
+        etEmailValue.setVisibility(View.VISIBLE);
+        etEmailValue.setText(email);
     }
 
     private void goBack() {
@@ -166,14 +305,8 @@ public class ProfileActivity extends AppCompatActivity implements UserResponse.I
             if(resultCode == AppCompatActivity.RESULT_OK){
                 Uri uri = data.getData();
                 File f = new File(uri.getPath());
-                Toast.makeText(this, "Image saved to -"+f.getAbsolutePath(), Toast.LENGTH_SHORT).show();
+//                Toast.makeText(this, "Image saved to -"+f.getAbsolutePath(), Toast.LENGTH_SHORT).show();
                 prepareImageForUpload(finalPath);
-//                if (selectedBitmap!= null) {
-//                    saveImageToExternalStorage(selectedBitmap);
-//                } else {
-//                    Toast.makeText(this, "File couldn't be cropped", Toast.LENGTH_SHORT).show();
-//                }
-
             }
         }
     }
@@ -196,32 +329,16 @@ public class ProfileActivity extends AppCompatActivity implements UserResponse.I
             // set crop properties
             cropIntent.putExtra("crop", "true");
             // indicate aspect of desired crop
-            cropIntent.putExtra("aspectX", 16);
-            cropIntent.putExtra("aspectY", 9);
+            cropIntent.putExtra("aspectX", 1);
+            cropIntent.putExtra("aspectY", 1);
             // indicate output X and Y
-
-            cropIntent.putExtra("outputX", 854);
-            cropIntent.putExtra("outputY", 480);
             boolean crop = true;
-            if(width < 1024 || height < 576){
-                if(width <= height){
-                    cropIntent.putExtra("outputX", (height*16)/9);
-                    cropIntent.putExtra("outputY", height);
-                    Log.v("cropImage", "outputX=" + width + " outputY=" + width);
-                }else{
-                    cropIntent.putExtra("outputX", (width*9)/16);
-                    cropIntent.putExtra("outputY", width);
-                    Log.v("cropImage","outputX="+height+" outputY="+height);
-                }
-            }else{
-                if(width < 854 || height < 480) {
-
-                    Toast.makeText(this, "Image is too small. Please choose another image.", Toast.LENGTH_LONG).show();
-                    crop = false;
-                } else {
-                    cropIntent.putExtra("outputX", 854);
-                    cropIntent.putExtra("outputY", 480);
-                }
+            if(width < 500 || height < 500) {
+                Toast.makeText(this, "Image is too small. Please choose another image.", Toast.LENGTH_LONG).show();
+                crop = false;
+            } else {
+                cropIntent.putExtra("outputX", 500);
+                cropIntent.putExtra("outputY", 500);
             }
 
             if (crop) {
@@ -266,11 +383,40 @@ public class ProfileActivity extends AppCompatActivity implements UserResponse.I
         this.userDetails = userDetails;
         Toast.makeText(this, R.string.image_success, Toast.LENGTH_LONG).show();
         UserResponse.saveUserDetails(this, userDetails);
+        Picasso.with(this).load(AppHelper.END_POINT+userDetails.getImage().getImageUrl()).placeholder(R.drawable.bg_signup_signin).error(R.drawable.bg_signup_signin).into(imgHeader);
+    }
+
+    @Override
+    public void onDetailsRetrieved(UserDetails userDetails) {
 
     }
 
     @Override
-    public void onFail(String message) {
+    public void onDetailsRetrieveFail(String message) {
+
+    }
+
+    @Override
+    public void onUploadFail(String message) {
         Toast.makeText(this, message, Toast.LENGTH_LONG).show();
+    }
+
+    @Override
+    public void onClick(View v) {
+        int id = v.getId();
+
+        switch (id) {
+            case R.id.img_edit:
+                Intent gallery_Intent = new Intent(getApplicationContext(), GalleryUtil.class);
+                startActivityForResult(gallery_Intent, GALLERY_ACTIVITY_CODE);
+                break;
+        }
+    }
+
+    class CourseItemViewHolder {
+
+        TextView tvItemValue;
+        ImageButton imgClear;
+
     }
 }

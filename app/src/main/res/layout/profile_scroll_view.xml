@@ -1,118 +1,246 @@
 <?xml version="1.0" encoding="utf-8"?>
 
-    <android.support.v4.widget.NestedScrollView xmlns:android="http://schemas.android.com/apk/res/android"
-        xmlns:app="http://schemas.android.com/apk/res-auto"
-        android:id="@+id/main_content"
+<android.support.v4.widget.NestedScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/main_content"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:layout_gravity="fill_vertical"
+    app:layout_behavior="@string/appbar_scrolling_view_behavior">
+
+    <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_gravity="fill_vertical"
-        app:layout_behavior="@string/appbar_scrolling_view_behavior">
+        android:orientation="vertical">
+
+        <LinearLayout
+            android:id="@+id/lilyQual"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="@dimen/activity_horizontal_margin"
+            android:layout_marginRight="@dimen/activity_horizontal_margin"
+            android:orientation="vertical">
+
+            <TextView
+                android:id="@+id/tvQualHeader"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
+                android:text="@string/qualification"
+                android:textAppearance="?android:attr/textAppearanceLarge"
+                android:textColor="@color/primary_color"
+                android:textStyle="bold" />
+
+            <TextView
+                android:id="@+id/tvQualValue"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
+                android:text="@string/placeholder_qual"
+                android:textAppearance="?android:attr/textAppearanceMedium"
+                android:textColor="@color/black" />
+
+            <EditText
+                android:id="@+id/etQualValue"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
+                android:textColor="@color/black"
+                android:visibility="gone" />
+
+        </LinearLayout>
+
+
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:layout_marginBottom="8dp"
+            android:layout_marginTop="8dp"
+            android:background="@color/black_55" />
 
         <LinearLayout
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="@dimen/activity_horizontal_margin"
+            android:layout_marginRight="@dimen/activity_horizontal_margin"
             android:orientation="vertical">
 
-            <LinearLayout
-                android:id="@+id/lilyQual"
+            <TextView
+                android:id="@+id/tvCourseHeader"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginLeft="@dimen/activity_horizontal_margin"
-                android:layout_marginRight="@dimen/activity_horizontal_margin"
-                android:orientation="vertical">
+                android:layout_marginBottom="8dp"
+                android:text="@string/courses"
+                android:textAppearance="?android:attr/textAppearanceLarge"
+                android:textColor="@color/primary_color"
+                android:textStyle="bold" />
+
+            <LinearLayout
+                android:id="@+id/lilyCourses"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:divider="@drawable/transparent_divider"
+                android:orientation="vertical"
+                android:showDividers="middle">
+
+            </LinearLayout>
+
+            <AutoCompleteTextView
+                android:id="@+id/etCourseValue"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
+                android:textColor="@color/black"
+                android:visibility="gone" />
+
+        </LinearLayout>
+
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:layout_marginBottom="8dp"
+            android:layout_marginTop="8dp"
+            android:background="@color/black_55" />
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="@dimen/activity_horizontal_margin"
+            android:layout_marginRight="@dimen/activity_horizontal_margin"
+            android:orientation="vertical">
+
+            <TextView
+                android:id="@+id/tvLanguageHeader"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="8dp"
+                android:text="@string/languages"
+                android:textAppearance="?android:attr/textAppearanceLarge"
+                android:textColor="@color/primary_color"
+                android:textStyle="bold" />
+
+            <LinearLayout
+                android:id="@+id/lilyLanguages"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:divider="@drawable/transparent_divider"
+                android:orientation="vertical"
+                android:showDividers="middle">
+
+            </LinearLayout>
+
+            <AutoCompleteTextView
+                android:id="@+id/etLangValue"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
+                android:textColor="@color/black"
+                android:visibility="gone" />
+
+        </LinearLayout>
+
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:layout_marginBottom="8dp"
+            android:layout_marginTop="8dp"
+            android:background="@color/black_55" />
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="@dimen/activity_horizontal_margin"
+            android:layout_marginRight="@dimen/activity_horizontal_margin"
+            android:orientation="vertical">
+
+            <TextView
+                android:id="@+id/tvContactHeader"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="8dp"
+                android:text="@string/contact"
+                android:textAppearance="?android:attr/textAppearanceLarge"
+                android:textColor="@color/primary_color"
+                android:textStyle="bold" />
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="8dp"
+                android:orientation="horizontal">
+
 
                 <TextView
-                    android:id="@+id/tvQualHeader"
-                    android:layout_width="match_parent"
+                    android:id="@+id/tvPhone"
+                    android:layout_width="80dp"
                     android:layout_height="wrap_content"
-                    android:layout_marginTop="8dp"
-                    android:text="@string/qualification"
-                    android:textAppearance="?android:attr/textAppearanceLarge"
-                    android:textColor="@color/primary_color"
-                    android:textStyle="bold" />
+                    android:text="@string/phone"
+                    android:textAppearance="?android:attr/textAppearanceMedium"
+                    android:textColor="@color/black"
+                    android:textStyle="italic"/>
 
                 <TextView
-                    android:id="@+id/tvQualValue"
+                    android:id="@+id/tvPhoneValue"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginTop="8dp"
-                    android:text="@string/placeholder_qual"
                     android:textAppearance="?android:attr/textAppearanceMedium"
                     android:textColor="@color/black" />
 
                 <EditText
-                    android:id="@+id/etQualValue"
+                    android:id="@+id/etPhoneValue"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginTop="8dp"
+                    android:textAppearance="?android:attr/textAppearanceMedium"
                     android:textColor="@color/black"
-                    android:visibility="gone"/>
+                    android:visibility="gone"
+                    android:inputType="phone"/>
 
             </LinearLayout>
-
-
-            <View
-                android:layout_width="match_parent"
-                android:layout_height="1dp"
-                android:background="@android:color/darker_gray"
-                android:layout_marginTop="8dp"
-                android:layout_marginBottom="8dp"/>
 
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginLeft="@dimen/activity_horizontal_margin"
-                android:layout_marginRight="@dimen/activity_horizontal_margin"
-                android:orientation="vertical">
+                android:orientation="horizontal">
+
 
                 <TextView
-                    android:id="@+id/tvCourseHeader"
-                    android:layout_width="match_parent"
+                    android:id="@+id/tvEmail"
+                    android:layout_width="80dp"
                     android:layout_height="wrap_content"
-                    android:text="@string/courses"
-                    android:textAppearance="?android:attr/textAppearanceLarge"
-                    android:textColor="@color/primary_color"
-                    android:textStyle="bold"
-                    android:layout_marginBottom="8dp"/>
-
-                <LinearLayout
-                    android:id="@+id/lilyCourses"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:orientation="vertical"
-                    android:showDividers="middle"
-                    android:divider="@drawable/transparent_divider">
-
-                    <!--<include layout="@layout/course_item"-->
-                    <!--android:id="@+id/course1"/>-->
-
-                    <!--<include layout="@layout/course_item"-->
-                    <!--android:id="@+id/course2"/>-->
-
-                    <!--<include layout="@layout/course_item"-->
-                    <!--android:id="@+id/course3"/>-->
-
-                </LinearLayout>
-
-                <AutoCompleteTextView
-                    android:id="@+id/etCourseValue"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="8dp"
+                    android:text="@string/email"
+                    android:textAppearance="?android:attr/textAppearanceMedium"
                     android:textColor="@color/black"
-                    android:visibility="gone"/>
+                    android:textStyle="italic"/>
+
+                <TextView
+                    android:id="@+id/tvEmailValue"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:textAppearance="?android:attr/textAppearanceMedium"
+                    android:textColor="@color/black" />
+
+                <EditText
+                    android:id="@+id/etEmailValue"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:textAppearance="?android:attr/textAppearanceMedium"
+                    android:textColor="@color/black"
+                    android:visibility="gone"
+                    android:inputType="textEmailAddress"/>
 
             </LinearLayout>
 
-            <View
-                android:layout_width="match_parent"
-                android:layout_height="1dp"
-                android:background="@android:color/darker_gray"
-                android:layout_marginTop="8dp"
-                android:layout_marginBottom="8dp" />
-
-
-
-
         </LinearLayout>
-    </android.support.v4.widget.NestedScrollView>
+
+        <Button
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/req_session"
+            android:id="@+id/button"
+            android:background="@drawable/primary_color_btn"
+            android:layout_marginTop="32dp"
+            android:visibility="gone"/>
+
+
+    </LinearLayout>
+</android.support.v4.widget.NestedScrollView>
