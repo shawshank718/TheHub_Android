@@ -8,6 +8,9 @@ import android.util.Log;
 import com.google.gson.Gson;
 import com.group6.thehub.Rest.RestClient;
 import com.group6.thehub.Rest.models.UserDetails;
+
+import java.util.List;
+
 import retrofit.Callback;
 import retrofit.RetrofitError;
 import retrofit.client.Response;
@@ -100,10 +103,35 @@ public class UserResponse extends BaseResponse {
                 if (userResponse.getMeta().isSuccess()) {
                     userDetailsQueryListener.onDetailsRetrieved(userResponse.getDetails());
                 } else {
-                    userDetailsQueryListener.onDetailsRetrieveFail(userResponse.getMeta().getMessage());
+                    userDetailsQueryListener.onDetailsQueryFail(userResponse.getMeta().getMessage());
                 }
                 progress.dismiss();
 
+            }
+
+            @Override
+            public void failure(RetrofitError error) {
+                progress.dismiss();
+            }
+        });
+    }
+
+    public static void updateUserDetails(Context context, int userId, String phone, String qualification, List<String> addedLaguages, List<String> deletedLanguages) {
+        final ProgressDialog progress = new ProgressDialog(context);
+        progress.setMessage("Loading information. Please Wait");
+        progress.setIndeterminate(true);
+        progress.show();
+        userDetailsQueryListener = (UserDetailsQueryListener) context;
+        RestClient restClient = new RestClient(context);
+        restClient.theHubApi.updateUserDetails(userId, phone, qualification, addedLaguages, deletedLanguages, new Callback<UserResponse>() {
+            @Override
+            public void success(UserResponse userResponse, Response response) {
+                if (userResponse.getMeta().isSuccess()) {
+                    userDetailsQueryListener.onDetailsUpdated(userResponse.getDetails());
+                } else {
+                    userDetailsQueryListener.onDetailsQueryFail(userResponse.getMeta().getMessage());
+                }
+                progress.dismiss();
             }
 
             @Override
@@ -176,8 +204,6 @@ public class UserResponse extends BaseResponse {
         editor.commit();
     }
 
-
-
     public interface UserVerificationListener {
         public void onRegistrationComplete(UserDetails userDetails);
         public void onSignInComplete(UserDetails userDetails);
@@ -191,7 +217,8 @@ public class UserResponse extends BaseResponse {
 
     public interface UserDetailsQueryListener {
         public void onDetailsRetrieved(UserDetails userDetails);
-        public void onDetailsRetrieveFail(String message);
+        public void onDetailsUpdated(UserDetails userDetails);
+        public void onDetailsQueryFail(String message);
     }
 
 }

@@ -1,8 +1,10 @@
 package com.group6.thehub.Rest;
 
 import com.group6.thehub.Rest.responses.BaseResponse;
+import com.group6.thehub.Rest.responses.LangaugesResponse;
 import com.group6.thehub.Rest.responses.UserResponse;
 
+import java.util.List;
 import java.util.Map;
 
 import retrofit.Callback;
@@ -41,6 +43,13 @@ public interface TheHubApi {
     void getUserDetails(@Query("id") int userId, Callback<UserResponse> resoponse);
 
     @GET("/theHub/getUserDetails.php")
-    void getUserDetails(@QueryMap Map<String, String> params, Callback<UserResponse> resoponse);
+    void getUserDetailsFromCourse(@Query("coursecode") String corseCode, @Query("type") String type, Callback<UserResponse> resoponse);
 
+    @FormUrlEncoded
+    @POST("/theHub/updateUserDetails.php")
+    void updateUserDetails(@Field("userId") int userId, @Field("phone") String phone, @Field("qualification") String qualification,
+                           @Field("langs[]")List<String> addedLanguages, @Field("delLangs[]")List<String> deletedLanguages, Callback<UserResponse> response);
+
+    @GET("/theHub/loadLanguages.php")
+    void loadLangauges(Callback<LangaugesResponse> response);
 }

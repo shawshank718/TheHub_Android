@@ -1,12 +1,15 @@
 package com.group6.thehub.activities;
 
 import android.content.ActivityNotFoundException;
+import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.net.Uri;
 import android.os.Environment;
 import android.provider.MediaStore;
 import android.support.design.widget.CollapsingToolbarLayout;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.Toolbar;
@@ -15,6 +18,8 @@ import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
 import android.widget.AutoCompleteTextView;
 import android.widget.EditText;
 import android.widget.ImageButton;
@@ -24,24 +29,29 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.group6.thehub.AppHelper;
+import com.group6.thehub.LanguagesAdapter;
 import com.group6.thehub.R;
 import com.group6.thehub.Rest.models.Course;
 import com.group6.thehub.Rest.models.Language;
+import com.group6.thehub.Rest.models.LanguageDetails;
 import com.group6.thehub.Rest.models.UserDetails;
+import com.group6.thehub.Rest.responses.LangaugesResponse;
 import com.group6.thehub.Rest.responses.UserResponse;
 import com.group6.thehub.views.AspectRatioImageView;
 import com.squareup.picasso.Picasso;
 
+import org.parceler.apache.commons.lang.StringUtils;
 import org.w3c.dom.Text;
 
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.List;
 
 import retrofit.mime.TypedFile;
 
-public class ProfileActivity extends AppCompatActivity implements UserResponse.ImageUploadResponseListener, View.OnClickListener, UserResponse.UserDetailsQueryListener {
+public class ProfileActivity extends AppCompatActivity implements UserResponse.ImageUploadResponseListener, View.OnClickListener, UserResponse.UserDetailsQueryListener, LangaugesResponse.LoadLanguagesListener {
 
     private Toolbar toolbar;
 
@@ -70,13 +80,19 @@ public class ProfileActivity extends AppCompatActivity implements UserResponse.I
     private TextView tvPhoneValue;
     private EditText etPhoneValue;
     private TextView tvEmailValue;
-    private EditText etEmailValue;
 
     private String qualification;
-    private String email;
     private String phone;
     private boolean inEditMode;
     private boolean isMine = false;
+
+    private List<Language> existingLanguages;
+    private List<String> addedLanguages;
+    private List<String> deletedLaguages;
+    private List<Language> languages;
+    private List<String> languageNames;
+    private ArrayAdapter<String> languageAdapter;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -88,17 +104,7 @@ public class ProfileActivity extends AppCompatActivity implements UserResponse.I
 
         userDetails = UserResponse.getUserDetails(this);
 
-        int userId = getIntent().getIntExtra("userId", -1);
-        if (userId == userDetails.getUserId()) {
-            isMine =true;
-            invalidateOptionsMenu();
-        } else {
-            UserResponse.retrieveUserDetails(this, userId);
-        }
-
-
         collapsingToolbarLayout = (CollapsingToolbarLayout) findViewById(R.id.collapsing_toolbar);
-        collapsingToolbarLayout.setTitle(userDetails.getFirstName() + " " + userDetails.getLastName());
 
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         getSupportActionBar().setDisplayShowHomeEnabled(true);
@@ -114,15 +120,24 @@ public class ProfileActivity extends AppCompatActivity implements UserResponse.I
         tvPhoneValue = (TextView) findViewById(R.id.tvPhoneValue);
         etPhoneValue = (EditText) findViewById(R.id.etPhoneValue);
         tvEmailValue = (TextView) findViewById(R.id.tvEmailValue);
-        etEmailValue = (EditText) findViewById(R.id.etEmailValue);
 
         imgEdit.setOnClickListener(this);
 
-        setupDetails(userDetails);
+        int userId = getIntent().getIntExtra("userId", -1);
+        if (userId == userDetails.getUserId()) {
+            isMine =true;
+            invalidateOptionsMenu();
+            setupDetails(userDetails);
+        } else {
+            UserResponse.retrieveUserDetails(this, userId);
+        }
+
+        LangaugesResponse.loadAllLanguages(this);
 
     }
 
     private void setupDetails(UserDetails userDetails) {
+        collapsingToolbarLayout.setTitle(userDetails.getFirstName() + " " + userDetails.getLastName());
         Picasso.with(this).setLoggingEnabled(true);
         Picasso.with(this).load(AppHelper.END_POINT+userDetails.getImage().getImageUrl()).placeholder(R.drawable.bg_signup_signin).error(R.drawable.bg_signup_signin).into(imgHeader);
         if (userDetails.getQualification() == null) {
@@ -132,10 +147,13 @@ public class ProfileActivity extends AppCompatActivity implements UserResponse.I
         }
         addLanguages(userDetails.getLanguages());
         addCourses(userDetails.getCourses());
+        tvPhoneValue.setText(userDetails.getPhone());
         tvEmailValue.setText(userDetails.getEmail());
+        existingLanguages = userDetails.getLanguages();
     }
 
     private void addCourses(ArrayList<Course> courses) {
+        lilyCourses.removeAllViews();
         if (!courses.isEmpty()) {
 
             for (Course course: courses) {
@@ -160,12 +178,14 @@ public class ProfileActivity extends AppCompatActivity implements UserResponse.I
         if (inEditMode) {
             holder.imgClear.setVisibility(View.VISIBLE);
         }
-        holder.tvItemValue.setText(course.getCourseCode()+": "+course.getCourseName());
+        holder.tvItemValue.setText(course.getCourseCode() + ": " + course.getCourseName());
+        holder.course = course;
         view.setTag(holder);
         lilyCourses.addView(view);
     }
 
     private void addLanguages(ArrayList<Language> languages) {
+        lilyLanguages.removeAllViews();
         if (!languages.isEmpty()) {
 
             for (Language language: languages) {
@@ -184,6 +204,12 @@ public class ProfileActivity extends AppCompatActivity implements UserResponse.I
             @Override
             public void onClick(View v) {
                 Log.d("ProfileActivity", "clear Clicked");
+                Language removedLanguage = ((Language) v.getTag());
+                if (deletedLaguages == null) {
+                    deletedLaguages = new ArrayList<String>();
+                }
+                deletedLaguages.add(removedLanguage.getShortName());
+                existingLanguages.remove(removedLanguage);
                 lilyLanguages.removeView((View) v.getParent());
             }
         });
@@ -191,6 +217,8 @@ public class ProfileActivity extends AppCompatActivity implements UserResponse.I
             holder.imgClear.setVisibility(View.VISIBLE);
         }
         holder.tvItemValue.setText(language.getEnglishName());
+        holder.language = language;
+        holder.imgClear.setTag(language);
         view.setTag(holder);
         lilyLanguages.addView(view);
     }
@@ -244,7 +272,80 @@ public class ProfileActivity extends AppCompatActivity implements UserResponse.I
             showEditMode();
         }
 
+        if (id == R.id.action_save) {
+            saveChangedDetails();
+        }
+
         return super.onOptionsItemSelected(item);
+    }
+
+    private void saveChangedDetails() {
+        final Context context = this;
+        final String qualification = etQualValue.getText().toString().trim();
+        final String phone = etPhoneValue.getText().toString().trim();
+        ArrayList<String> emptyFields = new ArrayList<>();
+        if (qualification.isEmpty()) {
+            emptyFields.add("Qualification");
+        }
+        if (phone.isEmpty()) {
+            emptyFields.add("Phone");
+        }
+        String message = "";
+        if (emptyFields.isEmpty()) {
+            UserResponse.updateUserDetails(this, userDetails.getUserId(), phone, qualification, addedLanguages, deletedLaguages);
+            showViewMode();
+        } else if (emptyFields.size() == 1) {
+            message = emptyFields.get(0)+" is empty. Are you sure want to save it?";
+        } else {
+            message = "The fields "+ StringUtils.join(emptyFields,", ")+ " are empty. Are you sure you want to save them?";
+        }
+        if (!message.isEmpty()) {
+            AlertDialog.Builder builder = new AlertDialog.Builder(this);
+            builder.setMessage(message);
+            builder.setPositiveButton("Yes", new DialogInterface.OnClickListener() {
+                @Override
+                public void onClick(DialogInterface dialog, int which) {
+                    UserResponse.updateUserDetails(context, userDetails.getUserId(), phone, qualification, addedLanguages, deletedLaguages);
+                    showViewMode();
+                }
+            });
+            builder.setNegativeButton("No", new DialogInterface.OnClickListener() {
+                @Override
+                public void onClick(DialogInterface dialog, int which) {
+                    dialog.dismiss();
+                }
+            });
+            builder.create().show();
+        }
+        try {
+            addedLanguages.clear();
+            deletedLaguages.clear();
+        } catch (NullPointerException e) {
+            System.err.println(e.getMessage());
+        }
+    }
+
+    private void showViewMode() {
+        inEditMode = false;
+        invalidateOptionsMenu();
+
+        imgEdit.setVisibility(View.GONE);
+        tvQualValue.setVisibility(View.VISIBLE);
+        etQualValue.setVisibility(View.GONE);
+        for (int i = 0; i < lilyCourses.getChildCount(); i++) {
+            View view = lilyCourses.getChildAt(i);
+            CourseItemViewHolder holder = (CourseItemViewHolder) view.getTag();
+            holder.imgClear.setVisibility(View.INVISIBLE);
+        }
+        etCourseValue.setVisibility(View.GONE);
+        for (int i = 0; i < lilyLanguages.getChildCount(); i++) {
+            View view = lilyLanguages.getChildAt(i);
+            CourseItemViewHolder holder = (CourseItemViewHolder) view.getTag();
+            holder.imgClear.setVisibility(View.INVISIBLE);
+        }
+        etLangValue.setVisibility(View.GONE);
+        tvPhoneValue.setVisibility(View.VISIBLE);
+        etPhoneValue.setVisibility(View.GONE);
     }
 
     private void showEditMode() {
@@ -253,7 +354,6 @@ public class ProfileActivity extends AppCompatActivity implements UserResponse.I
 
         qualification = tvQualValue.getText().toString();
         phone = tvPhoneValue.getText().toString();
-        email = tvEmailValue.getText().toString();
 
         imgEdit.setVisibility(View.VISIBLE);
         tvQualValue.setVisibility(View.GONE);
@@ -272,16 +372,13 @@ public class ProfileActivity extends AppCompatActivity implements UserResponse.I
         }
         etLangValue.setVisibility(View.VISIBLE);
         tvPhoneValue.setVisibility(View.GONE);
-        tvEmailValue.setVisibility(View.GONE);
         etPhoneValue.setVisibility(View.VISIBLE);
         etPhoneValue.setText(phone);
-        etEmailValue.setVisibility(View.VISIBLE);
-        etEmailValue.setText(email);
     }
 
     private void goBack() {
         finish();
-        overridePendingTransition(0,R.anim.push_right_out);
+        overridePendingTransition(0, R.anim.push_right_out);
     }
 
     @Override
@@ -388,17 +485,61 @@ public class ProfileActivity extends AppCompatActivity implements UserResponse.I
 
     @Override
     public void onDetailsRetrieved(UserDetails userDetails) {
-
+        this.userDetails = userDetails;
+        setupDetails(userDetails);
     }
 
     @Override
-    public void onDetailsRetrieveFail(String message) {
+    public void onDetailsUpdated(UserDetails userDetails) {
+        this.userDetails = userDetails;
+        UserResponse.saveUserDetails(this, userDetails);
+        setupDetails(userDetails);
+    }
 
+    @Override
+    public void onDetailsQueryFail(String message) {
+        Toast.makeText(this, message, Toast.LENGTH_LONG).show();
     }
 
     @Override
     public void onUploadFail(String message) {
         Toast.makeText(this, message, Toast.LENGTH_LONG).show();
+    }
+
+    @Override
+    public void languagesRetrieved(LanguageDetails languageDetails) {
+        this.languages = languageDetails.getLanguages();
+        this.languageNames = languageDetails.getEnglishNames();
+        setUpLanguagesAdapter();
+    }
+
+    @Override
+    public void loadLanguagesFailed(String message) {
+        Toast.makeText(this, message, Toast.LENGTH_LONG).show();
+    }
+
+    private void setUpLanguagesAdapter() {
+        languageAdapter = new ArrayAdapter(this, R.layout.autocomplete_item, languageNames);
+        etLangValue.setAdapter(languageAdapter);
+        etLangValue.setThreshold(2);
+        etLangValue.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                String chosenName = (String) parent.getItemAtPosition(position);
+                Language chosenLanguage = languages.get(languageNames.indexOf(chosenName));
+                if (existingLanguages.contains(chosenLanguage)) {
+                    Toast.makeText(getApplicationContext(), "That language has already been added", Toast.LENGTH_SHORT).show();
+                } else {
+                    addLanguageItem(chosenLanguage);
+                    existingLanguages.add(chosenLanguage);
+                    if (addedLanguages == null) {
+                        addedLanguages = new ArrayList<String>();
+                    }
+                    addedLanguages.add(chosenLanguage.getShortName());
+                }
+            }
+        });
+
     }
 
     @Override
@@ -413,10 +554,14 @@ public class ProfileActivity extends AppCompatActivity implements UserResponse.I
         }
     }
 
+
+
     class CourseItemViewHolder {
 
         TextView tvItemValue;
         ImageButton imgClear;
+        Language language;
+        Course course;
 
     }
 }

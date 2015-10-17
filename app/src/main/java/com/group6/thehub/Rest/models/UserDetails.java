@@ -26,6 +26,15 @@ public class UserDetails {
     float rating;
     ArrayList<Language> languages;
     ArrayList<Course> courses;
+    String phone;
+
+    public String getPhone() {
+        return phone.replace("a","");
+    }
+
+    public void setPhone(String phone) {
+        this.phone = phone;
+    }
 
     public int getUserId() {
         return userId;

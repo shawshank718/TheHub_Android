@@ -13,7 +13,7 @@
         android:layout_toLeftOf="@+id/imgClear"
         android:layout_centerVertical="true"
         android:maxLines="1"
-        android:ellipsize="end"/>
+        android:ellipsize="middle"/>
 
     <ImageButton
         android:layout_width="24dp"
