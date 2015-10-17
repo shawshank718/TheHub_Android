@@ -4,11 +4,7 @@ import android.app.ProgressDialog;
 import android.content.Context;
 
 import com.group6.thehub.Rest.RestClient;
-import com.group6.thehub.Rest.models.Language;
 import com.group6.thehub.Rest.models.LanguageDetails;
-
-import java.util.ArrayList;
-import java.util.List;
 
 import retrofit.Callback;
 import retrofit.RetrofitError;
@@ -19,7 +15,7 @@ import retrofit.client.Response;
  */
 public class LangaugesResponse extends BaseResponse {
 
-    public static LoadLanguagesListener loadLanguagesListener;
+    public static LanguageDetailsListener languageDetailsListener;
 
     LanguageDetails details;
 
@@ -32,15 +28,15 @@ public class LangaugesResponse extends BaseResponse {
         progress.setMessage("Loading information. Please Wait");
         progress.setIndeterminate(true);
         progress.show();
-        loadLanguagesListener = (LoadLanguagesListener) context;
+        languageDetailsListener = (LanguageDetailsListener) context;
         RestClient restClient = new RestClient(context);
         restClient.theHubApi.loadLangauges(new Callback<LangaugesResponse>() {
             @Override
             public void success(LangaugesResponse langaugesResponse, Response response) {
                 if (langaugesResponse.getMeta().isSuccess()) {
-                    loadLanguagesListener.languagesRetrieved(langaugesResponse.getDetails());
+                    languageDetailsListener.languagesRetrieved(langaugesResponse.getDetails());
                 } else {
-                    loadLanguagesListener.loadLanguagesFailed(langaugesResponse.getMeta().getMessage());
+                    languageDetailsListener.languageDetailsFail(langaugesResponse.getMeta().getMessage());
                 }
                 progress.dismiss();
             }
@@ -52,9 +48,9 @@ public class LangaugesResponse extends BaseResponse {
         });
     }
 
-    public interface LoadLanguagesListener {
+    public interface LanguageDetailsListener {
         public void languagesRetrieved(LanguageDetails languageDetails);
-        public void loadLanguagesFailed(String message);
+        public void languageDetailsFail(String message);
     }
 
 }

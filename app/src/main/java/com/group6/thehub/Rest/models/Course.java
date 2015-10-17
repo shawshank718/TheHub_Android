@@ -23,4 +23,16 @@ public class Course {
     public void setCourseName(String courseName) {
         this.courseName = courseName;
     }
+
+    @Override
+    public boolean equals(Object o) {
+        boolean same = false;
+
+        if (o != null && o instanceof Course)
+        {
+            same = this.courseCode.equals(((Course) o).courseCode);
+        }
+
+        return same;
+    }
 }

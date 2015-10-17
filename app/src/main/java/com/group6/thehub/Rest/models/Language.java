@@ -23,4 +23,16 @@ public class Language {
     public void setEnglishName(String englishName) {
         this.englishName = englishName;
     }
+
+    @Override
+    public boolean equals(Object o) {
+        boolean same = false;
+
+        if (o != null && o instanceof Language)
+        {
+            same = this.shortName.equals(((Language) o).shortName);
+        }
+
+        return same;
+    }
 }

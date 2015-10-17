@@ -116,14 +116,15 @@ public class UserResponse extends BaseResponse {
         });
     }
 
-    public static void updateUserDetails(Context context, int userId, String phone, String qualification, List<String> addedLaguages, List<String> deletedLanguages) {
+    public static void updateUserDetails(Context context, int userId, String phone, String qualification,
+                                         List<String> addedLaguages, List<String> deletedLanguages, List<String> addedCourses, List<String> deletedCourses) {
         final ProgressDialog progress = new ProgressDialog(context);
         progress.setMessage("Loading information. Please Wait");
         progress.setIndeterminate(true);
         progress.show();
         userDetailsQueryListener = (UserDetailsQueryListener) context;
         RestClient restClient = new RestClient(context);
-        restClient.theHubApi.updateUserDetails(userId, phone, qualification, addedLaguages, deletedLanguages, new Callback<UserResponse>() {
+        restClient.theHubApi.updateUserDetails(userId, phone, qualification, addedLaguages, deletedLanguages, addedCourses, deletedCourses, new Callback<UserResponse>() {
             @Override
             public void success(UserResponse userResponse, Response response) {
                 if (userResponse.getMeta().isSuccess()) {

@@ -21,27 +21,27 @@ import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.AutoCompleteTextView;
+import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.LinearLayout;
-import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import com.group6.thehub.AppHelper;
-import com.group6.thehub.LanguagesAdapter;
 import com.group6.thehub.R;
 import com.group6.thehub.Rest.models.Course;
+import com.group6.thehub.Rest.models.CourseDetails;
 import com.group6.thehub.Rest.models.Language;
 import com.group6.thehub.Rest.models.LanguageDetails;
 import com.group6.thehub.Rest.models.UserDetails;
+import com.group6.thehub.Rest.responses.CourseResponse;
 import com.group6.thehub.Rest.responses.LangaugesResponse;
 import com.group6.thehub.Rest.responses.UserResponse;
 import com.group6.thehub.views.AspectRatioImageView;
 import com.squareup.picasso.Picasso;
 
 import org.parceler.apache.commons.lang.StringUtils;
-import org.w3c.dom.Text;
 
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -51,7 +51,7 @@ import java.util.List;
 
 import retrofit.mime.TypedFile;
 
-public class ProfileActivity extends AppCompatActivity implements UserResponse.ImageUploadResponseListener, View.OnClickListener, UserResponse.UserDetailsQueryListener, LangaugesResponse.LoadLanguagesListener {
+public class ProfileActivity extends AppCompatActivity implements UserResponse.ImageUploadResponseListener, View.OnClickListener, UserResponse.UserDetailsQueryListener, LangaugesResponse.LanguageDetailsListener, CourseResponse.CourseDetailsListener {
 
     private Toolbar toolbar;
 
@@ -80,18 +80,26 @@ public class ProfileActivity extends AppCompatActivity implements UserResponse.I
     private TextView tvPhoneValue;
     private EditText etPhoneValue;
     private TextView tvEmailValue;
+    private Button btnReqSession;
 
     private String qualification;
     private String phone;
     private boolean inEditMode;
     private boolean isMine = false;
 
-    private List<Language> existingLanguages;
-    private List<String> addedLanguages;
-    private List<String> deletedLaguages;
-    private List<Language> languages;
-    private List<String> languageNames;
+    private List<Language> existingLanguages = new ArrayList<>();
+    private List<String> addedLanguages = new ArrayList<>();
+    private List<String> deletedLaguages = new ArrayList<>();
+    private List<Language> languages = new ArrayList<>();
+    private List<String> languageNames = new ArrayList<>();
     private ArrayAdapter<String> languageAdapter;
+
+    private List<Course> existingCourses = new ArrayList<>();
+    private List<String> addedCourses = new ArrayList<>();
+    private List<String> deletedCourses = new ArrayList<>();
+    private List<Course> courses = new ArrayList<>();
+    private List<String> courseCodes = new ArrayList<>();
+    private ArrayAdapter<String> coursesAdapter;
 
 
     @Override
@@ -120,6 +128,7 @@ public class ProfileActivity extends AppCompatActivity implements UserResponse.I
         tvPhoneValue = (TextView) findViewById(R.id.tvPhoneValue);
         etPhoneValue = (EditText) findViewById(R.id.etPhoneValue);
         tvEmailValue = (TextView) findViewById(R.id.tvEmailValue);
+        btnReqSession = (Button) findViewById(R.id.btn_req_session);
 
         imgEdit.setOnClickListener(this);
 
@@ -127,12 +136,14 @@ public class ProfileActivity extends AppCompatActivity implements UserResponse.I
         if (userId == userDetails.getUserId()) {
             isMine =true;
             invalidateOptionsMenu();
+            btnReqSession.setVisibility(View.GONE);
             setupDetails(userDetails);
         } else {
             UserResponse.retrieveUserDetails(this, userId);
         }
 
         LangaugesResponse.loadAllLanguages(this);
+        CourseResponse.loadAllCourses(this);
 
     }
 
@@ -150,6 +161,7 @@ public class ProfileActivity extends AppCompatActivity implements UserResponse.I
         tvPhoneValue.setText(userDetails.getPhone());
         tvEmailValue.setText(userDetails.getEmail());
         existingLanguages = userDetails.getLanguages();
+        existingCourses = userDetails.getCourses();
     }
 
     private void addCourses(ArrayList<Course> courses) {
@@ -172,6 +184,12 @@ public class ProfileActivity extends AppCompatActivity implements UserResponse.I
             @Override
             public void onClick(View v) {
                 Log.d("ProfileActivity", "clear Clicked");
+                Course removedCourse = ((Course) v.getTag());
+                if (deletedCourses == null) {
+                    deletedCourses = new ArrayList<String>();
+                }
+                deletedCourses.add(removedCourse.getCourseCode());
+                existingCourses.remove(removedCourse);
                 lilyCourses.removeView((View) v.getParent());
             }
         });
@@ -180,6 +198,7 @@ public class ProfileActivity extends AppCompatActivity implements UserResponse.I
         }
         holder.tvItemValue.setText(course.getCourseCode() + ": " + course.getCourseName());
         holder.course = course;
+        holder.imgClear.setTag(course);
         view.setTag(holder);
         lilyCourses.addView(view);
     }
@@ -292,7 +311,7 @@ public class ProfileActivity extends AppCompatActivity implements UserResponse.I
         }
         String message = "";
         if (emptyFields.isEmpty()) {
-            UserResponse.updateUserDetails(this, userDetails.getUserId(), phone, qualification, addedLanguages, deletedLaguages);
+            UserResponse.updateUserDetails(this, userDetails.getUserId(), phone, qualification, addedLanguages, deletedLaguages, addedCourses, deletedCourses);
             showViewMode();
         } else if (emptyFields.size() == 1) {
             message = emptyFields.get(0)+" is empty. Are you sure want to save it?";
@@ -305,7 +324,7 @@ public class ProfileActivity extends AppCompatActivity implements UserResponse.I
             builder.setPositiveButton("Yes", new DialogInterface.OnClickListener() {
                 @Override
                 public void onClick(DialogInterface dialog, int which) {
-                    UserResponse.updateUserDetails(context, userDetails.getUserId(), phone, qualification, addedLanguages, deletedLaguages);
+                    UserResponse.updateUserDetails(context, userDetails.getUserId(), phone, qualification, addedLanguages, deletedLaguages, addedCourses, deletedCourses);
                     showViewMode();
                 }
             });
@@ -514,7 +533,7 @@ public class ProfileActivity extends AppCompatActivity implements UserResponse.I
     }
 
     @Override
-    public void loadLanguagesFailed(String message) {
+    public void languageDetailsFail(String message) {
         Toast.makeText(this, message, Toast.LENGTH_LONG).show();
     }
 
@@ -525,6 +544,7 @@ public class ProfileActivity extends AppCompatActivity implements UserResponse.I
         etLangValue.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                etLangValue.setText("");
                 String chosenName = (String) parent.getItemAtPosition(position);
                 Language chosenLanguage = languages.get(languageNames.indexOf(chosenName));
                 if (existingLanguages.contains(chosenLanguage)) {
@@ -543,6 +563,42 @@ public class ProfileActivity extends AppCompatActivity implements UserResponse.I
     }
 
     @Override
+    public void coursesRetrieved(CourseDetails courseDetails) {
+        this.courses = courseDetails.getCourses();
+        this.courseCodes = courseDetails.getCourseCodes();
+        setUpCoursesAdapter();
+    }
+
+    @Override
+    public void courseDetailsFail(String message) {
+        Toast.makeText(this, message, Toast.LENGTH_LONG).show();
+    }
+
+    private void setUpCoursesAdapter() {
+        coursesAdapter = new ArrayAdapter(this, R.layout.autocomplete_item, courseCodes);
+        etCourseValue.setAdapter(coursesAdapter);
+        etCourseValue.setThreshold(2);
+        etCourseValue.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                etCourseValue.setText("");
+                String chosenCode = (String) parent.getItemAtPosition(position);
+                Course chosenCourse = courses.get(courseCodes.indexOf(chosenCode));
+                if (existingCourses.contains(chosenCourse)) {
+                    Toast.makeText(getApplicationContext(), "That language has already been added", Toast.LENGTH_SHORT).show();
+                } else {
+                    addCourseItem(chosenCourse);
+                    existingCourses.add(chosenCourse);
+                    if (addedLanguages == null) {
+                        addedLanguages = new ArrayList<String>();
+                    }
+                    addedCourses.add(chosenCourse.getCourseCode());
+                }
+            }
+        });
+    }
+
+    @Override
     public void onClick(View v) {
         int id = v.getId();
 
@@ -553,8 +609,6 @@ public class ProfileActivity extends AppCompatActivity implements UserResponse.I
                 break;
         }
     }
-
-
 
     class CourseItemViewHolder {
 

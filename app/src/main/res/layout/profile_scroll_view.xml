@@ -227,10 +227,10 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:text="@string/req_session"
-            android:id="@+id/button"
+            android:id="@+id/btn_req_session"
             android:background="@drawable/primary_color_btn"
             android:layout_marginTop="32dp"
-            android:visibility="gone"/>
+            android:visibility="visible"/>
 
 
     </LinearLayout>

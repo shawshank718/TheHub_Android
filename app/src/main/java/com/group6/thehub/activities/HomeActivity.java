@@ -8,24 +8,33 @@ import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
+
 import com.group6.thehub.AppHelper;
 import com.group6.thehub.R;
+import com.group6.thehub.Rest.models.Course;
+import com.group6.thehub.Rest.models.CourseDetails;
 import com.group6.thehub.Rest.models.UserDetails;
+import com.group6.thehub.Rest.responses.CourseResponse;
 import com.group6.thehub.Rest.responses.UserResponse;
 import com.quinny898.library.persistentsearch.SearchBox;
 import com.quinny898.library.persistentsearch.SearchResult;
 import com.squareup.picasso.Picasso;
 
 
+import java.util.ArrayList;
+import java.util.List;
+
 import de.hdodenhof.circleimageview.CircleImageView;
 
 
-public class HomeActivity extends AppCompatActivity implements View.OnClickListener{
+public class HomeActivity extends AppCompatActivity implements View.OnClickListener, CourseResponse.CourseDetailsListener{
 
     private static final String LOG_TAG = "HomeActivity";
 
@@ -48,6 +57,12 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
 
     private ImageView imgTint;
     private boolean isSearchOpened;
+
+    private String curSearchTerm = "";
+    private String preSearchTerm = "";
+
+    private List<Course> courses = new ArrayList<>();
+    private List<String> courseCodes = new ArrayList<>();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -83,10 +98,6 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
             @Override
             public boolean onNavigationItemSelected(MenuItem menuItem) {
 
-//                Checking if the item is in checked state or not, if not make it in checked state
-//                if(menuItem.isChecked()) menuItem.setChecked(false);
-//                else menuItem.setChecked(true);
-
                 //Closing drawer on item click
                 mDrawerLayout.closeDrawers();
                 Intent intent;
@@ -115,10 +126,6 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
             @Override
             public void onDrawerOpened(View drawerView) {
                 super.onDrawerOpened(drawerView);
-//                if (!mUserLearnedDrawer) {
-//                    mUserLearnedDrawer = true;
-//                    appHelper.saveToUserPrefs(USER_LEARNED_DRAWER, mUserLearnedDrawer+"");
-//                }
             }
 
             @Override
@@ -136,15 +143,7 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
 
         mDrawerLayout.setDrawerListener(mDrawerToggle);
 
-
-//        drawerFragment = (NavigationDrawerFragment) getSupportFragmentManager()
-//                .findFragmentById(R.id.fragment_navigation_drawer);
-//
-//        drawerFragment.setUp(R.id.fragment_navigation_drawer, (DrawerLayout) findViewById(R.id.drawer_layout), toolbar, userDetails);
-
-
-
-
+        CourseResponse.loadAllCourses(this);
     }
 
     @Override
@@ -170,6 +169,8 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
     }
 
     public void setUpSearchBox() {
+        searchBox.setLogoText("");
+        searchBox.setHint("Search by unit of study");
         searchBox.setSearchListener(new SearchBox.SearchListener() {
             @Override
             public void onSearchOpened() {
@@ -189,12 +190,19 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
             }
 
             @Override
-            public void onSearchTermChanged() {
-
+            public void onSearchTermChanged(String s) {
+                if (s.length() > 2) {
+                    searchBox.updateResults();
+                }
             }
 
             @Override
             public void onSearch(String s) {
+                Log.d(LOG_TAG, "on search " + s);
+            }
+
+            @Override
+            public void onResultClick(SearchResult searchResult) {
 
             }
         });
@@ -207,11 +215,18 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
 
     public void openSearch() {
         searchBox.revealFromMenuItem(R.id.action_search, this);
-        for (int x = 0; x < 10; x++) {
-            SearchResult option = new SearchResult("Result "
-                    + Integer.toString(x), ContextCompat.getDrawable(this, R.drawable.ic_history_black_24dp));
+        for (int i = 0; i < courses.size(); i++) {
+            String courseName = courses.get(i).getCourseName();
+            String courseCode = courseCodes.get(i);
+            SearchResult option = new SearchResult(courseCode+" - "+courseName);
             searchBox.addSearchable(option);
         }
+        searchBox.hideResults();
+//        for (int x = 0; x < 10; x++) {
+//            SearchResult option = new SearchResult("Result "
+//                    + Integer.toString(x), ContextCompat.getDrawable(this, R.drawable.ic_history_black_24dp));
+//            searchBox.addSearchable(option);
+//        }
     }
 
     @Override
@@ -219,5 +234,16 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
         switch (view.getId()) {
 
         }
+    }
+
+    @Override
+    public void coursesRetrieved(CourseDetails courseDetails) {
+        this.courses = courseDetails.getCourses();
+        this.courseCodes = courseDetails.getCourseCodes();
+    }
+
+    @Override
+    public void courseDetailsFail(String message) {
+        Toast.makeText(this, message, Toast.LENGTH_LONG).show();
     }
 }

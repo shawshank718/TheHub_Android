@@ -1,6 +1,7 @@
 package com.group6.thehub.Rest;
 
 import com.group6.thehub.Rest.responses.BaseResponse;
+import com.group6.thehub.Rest.responses.CourseResponse;
 import com.group6.thehub.Rest.responses.LangaugesResponse;
 import com.group6.thehub.Rest.responses.UserResponse;
 
@@ -48,8 +49,13 @@ public interface TheHubApi {
     @FormUrlEncoded
     @POST("/theHub/updateUserDetails.php")
     void updateUserDetails(@Field("userId") int userId, @Field("phone") String phone, @Field("qualification") String qualification,
-                           @Field("langs[]")List<String> addedLanguages, @Field("delLangs[]")List<String> deletedLanguages, Callback<UserResponse> response);
+                           @Field("langs[]")List<String> addedLanguages, @Field("delLangs[]")List<String> deletedLanguages,
+                           @Field("courses[]")List<String> addedCourses, @Field("delCourses[]")List<String> deletedCourses,
+                           Callback<UserResponse> response);
 
     @GET("/theHub/loadLanguages.php")
     void loadLangauges(Callback<LangaugesResponse> response);
+
+    @GET("/theHub/loadCourses.php")
+    void loadCourses(Callback<CourseResponse> response);
 }
