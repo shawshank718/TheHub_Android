@@ -176,6 +176,7 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
             public void onSearchOpened() {
                 isSearchOpened = true;
                 imgTint.setVisibility(View.VISIBLE);
+                searchBox.hideResults();
             }
 
             @Override
@@ -221,7 +222,7 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
             SearchResult option = new SearchResult(courseCode+" - "+courseName);
             searchBox.addSearchable(option);
         }
-        searchBox.hideResults();
+
 //        for (int x = 0; x < 10; x++) {
 //            SearchResult option = new SearchResult("Result "
 //                    + Integer.toString(x), ContextCompat.getDrawable(this, R.drawable.ic_history_black_24dp));
