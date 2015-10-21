@@ -1,9 +1,12 @@
 package com.group6.thehub.Rest;
 
+import com.group6.thehub.Rest.models.UserSearchDetails;
 import com.group6.thehub.Rest.responses.BaseResponse;
 import com.group6.thehub.Rest.responses.CourseResponse;
+import com.group6.thehub.Rest.responses.FavoritesResponse;
 import com.group6.thehub.Rest.responses.LangaugesResponse;
 import com.group6.thehub.Rest.responses.UserResponse;
+import com.group6.thehub.Rest.responses.UserSearchResponse;
 
 import java.util.List;
 import java.util.Map;
@@ -41,10 +44,10 @@ public interface TheHubApi {
     void uploadImage(@Part("image") TypedFile image, @Part("userId") long userId,  Callback<UserResponse> response );
 
     @GET("/theHub/getDetails.php")
-    void getUserDetails(@Query("id") int userId, Callback<UserResponse> resoponse);
+    void getUserDetails(@Query("id") int id, @Query("userId") int userId, Callback<UserResponse> resoponse);
 
     @GET("/theHub/getUserDetails.php")
-    void getUserDetailsFromCourse(@Query("coursecode") String corseCode, @Query("type") String type, Callback<UserResponse> resoponse);
+    void getUserDetailsFromCourse(@Query("coursecode") String courseCode, @Query("type") String type, Callback<UserSearchResponse> resoponse);
 
     @FormUrlEncoded
     @POST("/theHub/updateUserDetails.php")
@@ -58,4 +61,11 @@ public interface TheHubApi {
 
     @GET("/theHub/loadCourses.php")
     void loadCourses(Callback<CourseResponse> response);
+
+    @FormUrlEncoded
+    @POST("/theHub/favorites.php")
+    void favorites(@Field("tutorId") int tutorId, @Field("studentId") int studentId, @Field("ACTION") String action, Callback<FavoritesResponse> response);
+
+    @GET("/theHub/favorites.php")
+    void getFavorites(@Query("studentId") int studentId, Callback<FavoritesResponse> response);
 }

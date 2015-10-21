@@ -51,4 +51,9 @@ Aenean non cursus est. Fusce feugiat ex at suscipit suscipit. In tempus magna se
     <string name="contact">Contact</string>
     <string name="phone">Phone</string>
     <string name="req_session">REQUEST SESSION</string>
+    <string name="title_activity_search_results">SearchResultsActivity</string>
+    <string name="chages_updated">Your details have been updated.</string>
+    <string name="rec_for_you">Recommended for you</string>
+    <string name="no_recs">Add courses to your profile to get recommendations.</string>
+    <string name="favorites">Favorites</string>
 </resources>

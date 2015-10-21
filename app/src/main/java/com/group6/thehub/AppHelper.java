@@ -4,6 +4,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.SharedPreferences.Editor;
+import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.util.DisplayMetrics;
 import android.util.TypedValue;
@@ -23,9 +24,11 @@ public class AppHelper {
         this.mContext = mContext;
     }
 
-    public static void slideInStayStill(Intent intent) {
-        mContext.startActivity(intent);
-        ((AppCompatActivity) mContext).overridePendingTransition(R.anim.push_left_in, 0);
+    public static void slideInStayStill(AppCompatActivity from, Class to, Bundle bundle) {
+        Intent intent = new Intent(from, to);
+        intent.putExtras(bundle);
+        from.startActivity(intent);
+        from.overridePendingTransition(R.anim.push_left_in, 0);
     }
 
     public static void slideUpPushUp(Intent intent) {
@@ -52,8 +55,18 @@ public class AppHelper {
         return value;
     }
 
+    public static float getDensity(Context context){
+        float scale = context.getResources().getDisplayMetrics().density;
+        return scale;
+    }
+
     public static int dipToPixels(Context context, int dipValue) {
         DisplayMetrics metrics = context.getResources().getDisplayMetrics();
         return (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, dipValue, metrics);
+    }
+
+    public static int convertPixtoDip(Context context, int pixel){
+        float scale = getDensity(context);
+        return (int)((pixel - 0.5f)/scale);
     }
 }

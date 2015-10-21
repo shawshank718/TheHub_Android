@@ -9,10 +9,14 @@ import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
+import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.Button;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -22,6 +26,7 @@ import com.group6.thehub.Rest.models.Course;
 import com.group6.thehub.Rest.models.CourseDetails;
 import com.group6.thehub.Rest.models.UserDetails;
 import com.group6.thehub.Rest.responses.CourseResponse;
+import com.group6.thehub.Rest.responses.FavoritesResponse;
 import com.group6.thehub.Rest.responses.UserResponse;
 import com.quinny898.library.persistentsearch.SearchBox;
 import com.quinny898.library.persistentsearch.SearchResult;
@@ -34,12 +39,12 @@ import java.util.List;
 import de.hdodenhof.circleimageview.CircleImageView;
 
 
-public class HomeActivity extends AppCompatActivity implements View.OnClickListener, CourseResponse.CourseDetailsListener{
+public class HomeActivity extends AppCompatActivity implements View.OnClickListener, CourseResponse.CourseDetailsListener, NavigationView.OnNavigationItemSelectedListener, FavoritesResponse.FavoritesListener{
 
     private static final String LOG_TAG = "HomeActivity";
 
     private DrawerLayout mDrawerLayout;
-
+    AppHelper appHelper = new AppHelper(this);
     private ActionBarDrawerToggle mDrawerToggle;
     private NavigationView navigationView;
 
@@ -52,10 +57,12 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
     private UserDetails userDetails;
 
     private  Toolbar toolbar;
-
     private SearchBox searchBox;
-
     private ImageView imgTint;
+    private Button btnMore;
+    private LinearLayout lilyFavs;
+    private RelativeLayout reltvFavs;
+
     private boolean isSearchOpened;
 
     private String curSearchTerm = "";
@@ -73,10 +80,12 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
         searchBox = (SearchBox) findViewById(R.id.searchbox);
         setUpSearchBox();
         imgTint = (ImageView) findViewById(R.id.imgTint);
+        lilyFavs = (LinearLayout) findViewById(R.id.lily_favs);
+        reltvFavs = (RelativeLayout) findViewById(R.id.reltv_favs);
+        btnMore = (Button) findViewById(R.id.btn_more);
+        btnMore.setOnClickListener(this);
         userDetails = UserResponse.getUserDetails(this);
-        if (userDetails != null) {
-            setTitle("Hi " +userDetails.getFirstName());
-        }
+
 
         //Initializing NavigationView
         navigationView = (NavigationView) findViewById(R.id.navigation_view);
@@ -85,44 +94,12 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
         tvEmail = (TextView) navigationView.findViewById(R.id.tvEmail);
         tvName = (TextView) navigationView.findViewById(R.id.tvName);
 
-        tvEmail.setText(userDetails.getEmail());
-        tvName.setText(userDetails.getFirstName() + " " + userDetails.getLastName());
-        Picasso.with(this)
-                .load(AppHelper.END_POINT+userDetails.getImage().getImageUrl())
-                .placeholder(R.drawable.circle_placeholder_76dp)
-                .error(R.drawable.circle_placeholder_76dp)
-                .into(profileImgView);
+        updateUserDetails();
 
-
-        navigationView.setNavigationItemSelectedListener(new NavigationView.OnNavigationItemSelectedListener() {
-            @Override
-            public boolean onNavigationItemSelected(MenuItem menuItem) {
-
-                //Closing drawer on item click
-                mDrawerLayout.closeDrawers();
-                Intent intent;
-                switch (menuItem.getItemId()) {
-
-                    case R.id.profile:
-                        intent = new Intent(getApplicationContext(), ProfileActivity.class);
-                        intent.putExtra("userId", userDetails.getUserId());
-                        AppHelper.slideInStayStill(intent);
-                        return true;
-                    case R.id.logout:
-                        UserResponse.callLogout(getApplicationContext());
-                        intent = new Intent(getApplicationContext(), SignInSignUpActivity.class);
-                        AppHelper.slideDownPushDown(intent);
-                        finish();
-                        return true;
-
-                    default:
-                        return true;
-                }
-            }
-        });
+        navigationView.setNavigationItemSelectedListener(this);
 
         mDrawerLayout = (DrawerLayout) findViewById(R.id.drawer_layout);
-        mDrawerToggle =new ActionBarDrawerToggle(this, mDrawerLayout, toolbar,R.string.drawer_open, R.string.drawer_close){
+        mDrawerToggle = new ActionBarDrawerToggle(this, mDrawerLayout, toolbar,R.string.drawer_open, R.string.drawer_close){
             @Override
             public void onDrawerOpened(View drawerView) {
                 super.onDrawerOpened(drawerView);
@@ -140,10 +117,28 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
                 mDrawerToggle.syncState();
             }
         });
-
         mDrawerLayout.setDrawerListener(mDrawerToggle);
 
+        FavoritesResponse.getFavorites(this, userDetails.getUserId());
         CourseResponse.loadAllCourses(this);
+    }
+
+    @Override
+    public void onWindowFocusChanged(boolean hasFocus) {
+        super.onWindowFocusChanged(hasFocus);
+
+        Log.d(LOG_TAG, AppHelper.convertPixtoDip(this, reltvFavs.getHeight()) + "");
+    }
+
+    public void updateUserDetails() {
+        setTitle("Hi " +userDetails.getFirstName());
+        tvEmail.setText(userDetails.getEmail());
+        tvName.setText(userDetails.getFirstName() + " " + userDetails.getLastName());
+        Picasso.with(this)
+                .load(AppHelper.END_POINT+userDetails.getImage().getImageUrl())
+                .placeholder(R.drawable.circle_placeholder_76dp)
+                .error(R.drawable.circle_placeholder_76dp)
+                .into(profileImgView);
     }
 
     @Override
@@ -192,6 +187,7 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
 
             @Override
             public void onSearchTermChanged(String s) {
+                searchBox.hideResults();
                 if (s.length() > 2) {
                     searchBox.updateResults();
                 }
@@ -199,15 +195,31 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
 
             @Override
             public void onSearch(String s) {
-                Log.d(LOG_TAG, "on search " + s);
+
             }
 
             @Override
             public void onResultClick(SearchResult searchResult) {
-
+                String searchCourseCode = (String) searchResult.getTag();
+                goToSearchResultActivity(searchCourseCode);
+            }
+        });
+        for (int i = 0; i < courses.size(); i++) {
+            String courseName = courses.get(i).getCourseName();
+            String courseCode = courseCodes.get(i);
+            SearchResult option = new SearchResult(courseCode+" - "+courseName);
+            option.setTag(courseCode);
+            searchBox.addSearchable(option);
+        }
+        searchBox.setSearchFilter(new SearchBox.SearchFilter() {
+            @Override
+            public boolean onFilter(SearchResult searchResult, String searchTerm) {
+                return searchResult.title.toLowerCase().contains(searchTerm.toLowerCase());
             }
         });
     }
+
+
 
     protected void closeSearch() {
         searchBox.hideCircularly(this);
@@ -216,18 +228,7 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
 
     public void openSearch() {
         searchBox.revealFromMenuItem(R.id.action_search, this);
-        for (int i = 0; i < courses.size(); i++) {
-            String courseName = courses.get(i).getCourseName();
-            String courseCode = courseCodes.get(i);
-            SearchResult option = new SearchResult(courseCode+" - "+courseName);
-            searchBox.addSearchable(option);
-        }
-
-//        for (int x = 0; x < 10; x++) {
-//            SearchResult option = new SearchResult("Result "
-//                    + Integer.toString(x), ContextCompat.getDrawable(this, R.drawable.ic_history_black_24dp));
-//            searchBox.addSearchable(option);
-//        }
+        searchBox.hideResults();
     }
 
     @Override
@@ -241,10 +242,101 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
     public void coursesRetrieved(CourseDetails courseDetails) {
         this.courses = courseDetails.getCourses();
         this.courseCodes = courseDetails.getCourseCodes();
+        setUpSearchBox();
     }
 
     @Override
     public void courseDetailsFail(String message) {
         Toast.makeText(this, message, Toast.LENGTH_LONG).show();
     }
+
+    private void goToSearchResultActivity(String searchCourseCode) {
+        Bundle bundle = new Bundle();
+        bundle.putString("search", searchCourseCode);
+        AppHelper.slideInStayStill(this, SearchResultsActivity.class, bundle);
+    }
+
+    @Override
+    public boolean onNavigationItemSelected(MenuItem menuItem) {
+        mDrawerLayout.closeDrawers();
+        Intent intent;
+        switch (menuItem.getItemId()) {
+
+            case R.id.profile:
+                Bundle bundle = new Bundle();
+                bundle.putInt("userId", userDetails.getUserId());
+                AppHelper.slideInStayStill(this, ProfileActivity.class, bundle);
+                return true;
+            case R.id.logout:
+                UserResponse.callLogout(getApplicationContext());
+                intent = new Intent(this, SignInSignUpActivity.class);
+                appHelper.slideDownPushDown(intent);
+                finish();
+                return true;
+
+            default:
+                return true;
+        }
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+
+    }
+
+    @Override
+    protected void onRestart() {
+        super.onRestart();
+        this.userDetails = UserResponse.getUserDetails(this);
+        updateUserDetails();
+        FavoritesResponse.getFavorites(this, userDetails.getUserId());
+    }
+
+    @Override
+    public void onFavoritesRetrieved(List<UserDetails> users) {
+        setUpFavorites(users);
+    }
+
+    @Override
+    public void onFavoriteActionSuccess(String message) {
+
+    }
+
+    @Override
+    public void onFavoriteCallFail(String message) {
+        Toast.makeText(this, message, Toast.LENGTH_LONG).show();
+    }
+
+    private void setUpFavorites(List<UserDetails> users) {
+        if(users.size() <= 3) {
+            btnMore.setVisibility(View.GONE);
+        } else {
+            btnMore.setVisibility(View.VISIBLE);
+        }
+        int length = users.size() > 3 ? 2 : users.size();
+        for (int i = 0; i < length; i++) {
+            lilyFavs.getChildAt(i).setVisibility(View.VISIBLE);
+            FavoritesViewHolder fvh = new FavoritesViewHolder(lilyFavs.getChildAt(i));
+            fvh.tvName.setText(users.get(i).getFullName());
+            Picasso.with(this)
+                    .load(AppHelper.END_POINT+users.get(i).getImage().getImageUrl())
+                    .placeholder(R.drawable.ic_account_circle_grey_48dp)
+                    .error(R.drawable.ic_account_circle_grey_48dp)
+                    .into(fvh.imgUser);
+        }
+    }
+
+    private class FavoritesViewHolder {
+
+        ImageView imgUser;
+        TextView tvName;
+
+        public FavoritesViewHolder(View view) {
+            imgUser = (ImageView) view.findViewById(R.id.profile_image);
+            tvName = (TextView) view.findViewById(R.id.tv_name);
+        }
+
+    }
+
 }

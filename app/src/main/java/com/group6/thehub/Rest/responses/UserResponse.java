@@ -90,14 +90,14 @@ public class UserResponse extends BaseResponse {
         });
     }
 
-    public static void retrieveUserDetails(Context context, int userId) {
+    public static void retrieveUserDetails(Context context, int id, int userId) {
         final ProgressDialog progress = new ProgressDialog(context);
         progress.setMessage("Loading information. Please Wait");
         progress.setIndeterminate(true);
         progress.show();
         userDetailsQueryListener = (UserDetailsQueryListener) context;
         RestClient restClient = new RestClient(context);
-        restClient.theHubApi.getUserDetails(userId, new Callback<UserResponse>() {
+        restClient.theHubApi.getUserDetails(id, userId, new Callback<UserResponse>() {
             @Override
             public void success(UserResponse userResponse, Response response) {
                 if (userResponse.getMeta().isSuccess()) {
@@ -117,14 +117,14 @@ public class UserResponse extends BaseResponse {
     }
 
     public static void updateUserDetails(Context context, int userId, String phone, String qualification,
-                                         List<String> addedLaguages, List<String> deletedLanguages, List<String> addedCourses, List<String> deletedCourses) {
+                                         List<String> addedLanguages, List<String> deletedLanguages, List<String> addedCourses, List<String> deletedCourses) {
         final ProgressDialog progress = new ProgressDialog(context);
         progress.setMessage("Loading information. Please Wait");
         progress.setIndeterminate(true);
         progress.show();
         userDetailsQueryListener = (UserDetailsQueryListener) context;
         RestClient restClient = new RestClient(context);
-        restClient.theHubApi.updateUserDetails(userId, phone, qualification, addedLaguages, deletedLanguages, addedCourses, deletedCourses, new Callback<UserResponse>() {
+        restClient.theHubApi.updateUserDetails(userId, phone, qualification, addedLanguages, deletedLanguages, addedCourses, deletedCourses, new Callback<UserResponse>() {
             @Override
             public void success(UserResponse userResponse, Response response) {
                 if (userResponse.getMeta().isSuccess()) {
@@ -212,14 +212,14 @@ public class UserResponse extends BaseResponse {
     }
 
     public interface  ImageUploadResponseListener {
-        public void onImageUpload(UserDetails userDetails);
-        public void onUploadFail(String message);
+        void onImageUpload(UserDetails userDetails);
+        void onUploadFail(String message);
     }
 
     public interface UserDetailsQueryListener {
-        public void onDetailsRetrieved(UserDetails userDetails);
-        public void onDetailsUpdated(UserDetails userDetails);
-        public void onDetailsQueryFail(String message);
+        void onDetailsRetrieved(UserDetails userDetails);
+        void onDetailsUpdated(UserDetails userDetails);
+        void onDetailsQueryFail(String message);
     }
 
 }

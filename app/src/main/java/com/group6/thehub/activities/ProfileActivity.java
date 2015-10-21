@@ -28,6 +28,7 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.google.common.base.Joiner;
 import com.group6.thehub.AppHelper;
 import com.group6.thehub.R;
 import com.group6.thehub.Rest.models.Course;
@@ -36,12 +37,11 @@ import com.group6.thehub.Rest.models.Language;
 import com.group6.thehub.Rest.models.LanguageDetails;
 import com.group6.thehub.Rest.models.UserDetails;
 import com.group6.thehub.Rest.responses.CourseResponse;
+import com.group6.thehub.Rest.responses.FavoritesResponse;
 import com.group6.thehub.Rest.responses.LangaugesResponse;
 import com.group6.thehub.Rest.responses.UserResponse;
 import com.group6.thehub.views.AspectRatioImageView;
 import com.squareup.picasso.Picasso;
-
-import org.parceler.apache.commons.lang.StringUtils;
 
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -51,19 +51,21 @@ import java.util.List;
 
 import retrofit.mime.TypedFile;
 
-public class ProfileActivity extends AppCompatActivity implements UserResponse.ImageUploadResponseListener, View.OnClickListener, UserResponse.UserDetailsQueryListener, LangaugesResponse.LanguageDetailsListener, CourseResponse.CourseDetailsListener {
+public class ProfileActivity extends AppCompatActivity implements UserResponse.ImageUploadResponseListener, View.OnClickListener,
+        UserResponse.UserDetailsQueryListener, LangaugesResponse.LanguageDetailsListener, CourseResponse.CourseDetailsListener, FavoritesResponse.FavoritesListener {
 
     private Toolbar toolbar;
 
     private CollapsingToolbarLayout collapsingToolbarLayout;
 
     private UserDetails userDetails;
+    private UserDetails curUserDetails;
 
     private final int GALLERY_ACTIVITY_CODE = 200;
 
     private final int RESULT_CROP = 400;
 
-    private String picturePath;
+    private String picturePath = "";
 
     public static String cropImagePath = Environment.getExternalStorageDirectory().getAbsolutePath() + "/TheHub/";
 
@@ -100,6 +102,7 @@ public class ProfileActivity extends AppCompatActivity implements UserResponse.I
     private List<Course> courses = new ArrayList<>();
     private List<String> courseCodes = new ArrayList<>();
     private ArrayAdapter<String> coursesAdapter;
+    private boolean imageAdded = false;
 
 
     @Override
@@ -134,20 +137,23 @@ public class ProfileActivity extends AppCompatActivity implements UserResponse.I
 
         int userId = getIntent().getIntExtra("userId", -1);
         if (userId == userDetails.getUserId()) {
-            isMine =true;
+            isMine = true;
             invalidateOptionsMenu();
             btnReqSession.setVisibility(View.GONE);
             setupDetails(userDetails);
+            LangaugesResponse.loadAllLanguages(this);
+            CourseResponse.loadAllCourses(this);
         } else {
-            UserResponse.retrieveUserDetails(this, userId);
+            isMine = false;
+            invalidateOptionsMenu();
+            curUserDetails = UserResponse.getUserDetails(this);
+            UserResponse.retrieveUserDetails(this, userId, userDetails.getUserId());
         }
-
-        LangaugesResponse.loadAllLanguages(this);
-        CourseResponse.loadAllCourses(this);
 
     }
 
     private void setupDetails(UserDetails userDetails) {
+        invalidateOptionsMenu();
         collapsingToolbarLayout.setTitle(userDetails.getFirstName() + " " + userDetails.getLastName());
         Picasso.with(this).setLoggingEnabled(true);
         Picasso.with(this).load(AppHelper.END_POINT+userDetails.getImage().getImageUrl()).placeholder(R.drawable.bg_signup_signin).error(R.drawable.bg_signup_signin).into(imgHeader);
@@ -162,6 +168,9 @@ public class ProfileActivity extends AppCompatActivity implements UserResponse.I
         tvEmailValue.setText(userDetails.getEmail());
         existingLanguages = userDetails.getLanguages();
         existingCourses = userDetails.getCourses();
+        if (userDetails.isFavorite()) {
+            invalidateOptionsMenu();
+        }
     }
 
     private void addCourses(ArrayList<Course> courses) {
@@ -259,6 +268,13 @@ public class ProfileActivity extends AppCompatActivity implements UserResponse.I
             menu.getItem(2).setVisible(false);
         } else {
             menu.getItem(0).setVisible(true);
+            if(userDetails != null) {
+                if(userDetails.isFavorite()) {
+                    menu.getItem(0).setIcon(R.drawable.ic_favorite_white_24dp);
+                } else {
+                    menu.getItem(0).setIcon(R.drawable.ic_favorite_outline_white_24dp);
+                }
+            }
             menu.getItem(1).setVisible(false);
             menu.getItem(2).setVisible(false);
             return true;
@@ -295,6 +311,10 @@ public class ProfileActivity extends AppCompatActivity implements UserResponse.I
             saveChangedDetails();
         }
 
+        if (id == R.id.action_favorite) {
+            toggleFavorite();
+        }
+
         return super.onOptionsItemSelected(item);
     }
 
@@ -316,7 +336,7 @@ public class ProfileActivity extends AppCompatActivity implements UserResponse.I
         } else if (emptyFields.size() == 1) {
             message = emptyFields.get(0)+" is empty. Are you sure want to save it?";
         } else {
-            message = "The fields "+ StringUtils.join(emptyFields,", ")+ " are empty. Are you sure you want to save them?";
+            message = "The fields "+ Joiner.on(", ").join(emptyFields)+ " are empty. Are you sure you want to save them?";
         }
         if (!message.isEmpty()) {
             AlertDialog.Builder builder = new AlertDialog.Builder(this);
@@ -336,12 +356,14 @@ public class ProfileActivity extends AppCompatActivity implements UserResponse.I
             });
             builder.create().show();
         }
-        try {
-            addedLanguages.clear();
-            deletedLaguages.clear();
-        } catch (NullPointerException e) {
-            System.err.println(e.getMessage());
+        if (imageAdded) {
+            if (finalPath.isEmpty()) {
+                prepareImageForUpload(picturePath);
+            } else {
+                prepareImageForUpload(finalPath);
+            }
         }
+
     }
 
     private void showViewMode() {
@@ -395,6 +417,17 @@ public class ProfileActivity extends AppCompatActivity implements UserResponse.I
         etPhoneValue.setText(phone);
     }
 
+    private void toggleFavorite() {
+        String action = "";
+        if (userDetails.isFavorite()) {
+            action = "DROP";
+        } else {
+            action = "INSERT";
+        }
+        userDetails.setFavorite(!userDetails.isFavorite());
+        FavoritesResponse.favorites(this, userDetails.getUserId(), curUserDetails.getUserId(), action);
+    }
+
     private void goBack() {
         finish();
         overridePendingTransition(0, R.anim.push_right_out);
@@ -421,8 +454,8 @@ public class ProfileActivity extends AppCompatActivity implements UserResponse.I
             if(resultCode == AppCompatActivity.RESULT_OK){
                 Uri uri = data.getData();
                 File f = new File(uri.getPath());
-//                Toast.makeText(this, "Image saved to -"+f.getAbsolutePath(), Toast.LENGTH_SHORT).show();
-                prepareImageForUpload(finalPath);
+                imageAdded = true;
+                Picasso.with(this).load(new File(finalPath)).placeholder(R.drawable.bg_signup_signin).error(R.drawable.bg_signup_signin).into(imgHeader);
             }
         }
     }
@@ -476,7 +509,8 @@ public class ProfileActivity extends AppCompatActivity implements UserResponse.I
             String errorMessage = "your device doesn't support the crop action! The full image will be uploaded.";
             Toast toast = Toast.makeText(this, errorMessage, Toast.LENGTH_SHORT);
             toast.show();
-            prepareImageForUpload(picUri);
+            imageAdded = true;
+            Picasso.with(this).load(new File(picturePath)).placeholder(R.drawable.bg_signup_signin).error(R.drawable.bg_signup_signin).into(imgHeader);
         } catch (FileNotFoundException e) {
             Toast toast = Toast.makeText(this, "File not found", Toast.LENGTH_SHORT);
             toast.show();
@@ -488,7 +522,6 @@ public class ProfileActivity extends AppCompatActivity implements UserResponse.I
 
 
     public void prepareImageForUpload(String path) {
-
         File file = new File(path);
         UserResponse.uploadImageToServer(this, new TypedFile("image/*", file), userDetails.getUserId());
 
@@ -497,9 +530,15 @@ public class ProfileActivity extends AppCompatActivity implements UserResponse.I
     @Override
     public void onImageUpload(UserDetails userDetails) {
         this.userDetails = userDetails;
-        Toast.makeText(this, R.string.image_success, Toast.LENGTH_LONG).show();
         UserResponse.saveUserDetails(this, userDetails);
         Picasso.with(this).load(AppHelper.END_POINT+userDetails.getImage().getImageUrl()).placeholder(R.drawable.bg_signup_signin).error(R.drawable.bg_signup_signin).into(imgHeader);
+        picturePath = "";
+        if (!finalPath.isEmpty()) {
+            File f = new File(finalPath);
+            f.delete();
+            finalPath = "";
+        }
+        picturePath = "";
     }
 
     @Override
@@ -513,11 +552,24 @@ public class ProfileActivity extends AppCompatActivity implements UserResponse.I
         this.userDetails = userDetails;
         UserResponse.saveUserDetails(this, userDetails);
         setupDetails(userDetails);
+        try {
+            addedLanguages.clear();
+            deletedLaguages.clear();
+        } catch (NullPointerException e) {
+            System.err.println(e.getMessage());
+        }
+        Toast.makeText(this, R.string.chages_updated, Toast.LENGTH_LONG).show();
     }
 
     @Override
     public void onDetailsQueryFail(String message) {
         Toast.makeText(this, message, Toast.LENGTH_LONG).show();
+        try {
+            addedLanguages.clear();
+            deletedLaguages.clear();
+        } catch (NullPointerException e) {
+            System.err.println(e.getMessage());
+        }
     }
 
     @Override
@@ -608,6 +660,24 @@ public class ProfileActivity extends AppCompatActivity implements UserResponse.I
                 startActivityForResult(gallery_Intent, GALLERY_ACTIVITY_CODE);
                 break;
         }
+    }
+
+    @Override
+    public void onFavoritesRetrieved(List<UserDetails> users) {
+
+    }
+
+    @Override
+    public void onFavoriteActionSuccess(String message) {
+        Toast.makeText(this, message, Toast.LENGTH_LONG).show();
+        invalidateOptionsMenu();
+    }
+
+    @Override
+    public void onFavoriteCallFail(String message) {
+        Toast.makeText(this, message, Toast.LENGTH_LONG).show();
+        userDetails.setFavorite(!userDetails.isFavorite());
+        invalidateOptionsMenu();
     }
 
     class CourseItemViewHolder {
