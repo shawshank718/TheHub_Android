@@ -29,7 +29,9 @@ public class AppHelper {
 
     public static void slideInStayStill(AppCompatActivity from, Class to, Bundle bundle) {
         Intent intent = new Intent(from, to);
-        intent.putExtras(bundle);
+        if (bundle != null) {
+            intent.putExtras(bundle);
+        }
         from.startActivity(intent);
         from.overridePendingTransition(R.anim.push_left_in, 0);
     }

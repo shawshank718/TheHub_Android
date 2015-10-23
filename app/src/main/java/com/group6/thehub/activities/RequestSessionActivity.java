@@ -81,6 +81,7 @@ public class RequestSessionActivity extends AppCompatActivity implements View.On
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_request_session);
+        instantiateViews();
         setUpToolbar();
         user_cur = UserResponse.getUserDetails(this);
         session_id = getIntent().getIntExtra("sessionId", -1);
@@ -88,7 +89,6 @@ public class RequestSessionActivity extends AppCompatActivity implements View.On
             SessionResponse.getSession(this, session_id);
         } else {
             user_oth_id = getIntent().getIntExtra("userId", -1);
-            instantiateViews();
             setUpViews();
         }
 
