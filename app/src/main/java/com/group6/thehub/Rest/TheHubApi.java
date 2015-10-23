@@ -5,8 +5,10 @@ import com.group6.thehub.Rest.responses.BaseResponse;
 import com.group6.thehub.Rest.responses.CourseResponse;
 import com.group6.thehub.Rest.responses.FavoritesResponse;
 import com.group6.thehub.Rest.responses.LangaugesResponse;
+import com.group6.thehub.Rest.responses.LocationResponse;
 import com.group6.thehub.Rest.responses.UserResponse;
 import com.group6.thehub.Rest.responses.UserSearchResponse;
+import com.squareup.okhttp.Call;
 
 import java.util.List;
 import java.util.Map;
@@ -68,4 +70,12 @@ public interface TheHubApi {
 
     @GET("/theHub/favorites.php")
     void getFavorites(@Query("studentId") int studentId, Callback<FavoritesResponse> response);
+
+    @GET("/theHub/getLocations.php")
+    void getLocations(Callback<LocationResponse> response);
+
+    @FormUrlEncoded
+    @POST("/theHub/sessions.php")
+    void createSession(@Field("studentId") int studentId, @Field("tutorId") int tutorId, @Field("locationId") int locationId, @Field("courseCode") String courseCode,
+                       @Field("startTime") long startTime, @Field("endTime") long endTime, @Field("ACTION") String action);
 }

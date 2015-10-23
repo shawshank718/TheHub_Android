@@ -79,7 +79,7 @@
                 android:id="@+id/lilyCourses"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:divider="@drawable/transparent_divider"
+                android:divider="@drawable/transparent_divider_height"
                 android:orientation="vertical"
                 android:showDividers="middle">
 
@@ -123,7 +123,7 @@
                 android:id="@+id/lilyLanguages"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:divider="@drawable/transparent_divider"
+                android:divider="@drawable/transparent_divider_height"
                 android:orientation="vertical"
                 android:showDividers="middle">
 
@@ -226,8 +226,8 @@
         <Button
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="@string/req_session"
-            android:id="@+id/btn_req_session"
+            android:text="@string/con_tut"
+            android:id="@+id/btn_cont_tut"
             android:background="@drawable/primary_color_btn"
             android:layout_marginTop="32dp"
             android:visibility="visible"/>

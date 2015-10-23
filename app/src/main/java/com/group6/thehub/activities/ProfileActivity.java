@@ -82,7 +82,7 @@ public class ProfileActivity extends AppCompatActivity implements UserResponse.I
     private TextView tvPhoneValue;
     private EditText etPhoneValue;
     private TextView tvEmailValue;
-    private Button btnReqSession;
+    private Button btnContTut;
 
     private String qualification;
     private String phone;
@@ -131,7 +131,8 @@ public class ProfileActivity extends AppCompatActivity implements UserResponse.I
         tvPhoneValue = (TextView) findViewById(R.id.tvPhoneValue);
         etPhoneValue = (EditText) findViewById(R.id.etPhoneValue);
         tvEmailValue = (TextView) findViewById(R.id.tvEmailValue);
-        btnReqSession = (Button) findViewById(R.id.btn_req_session);
+        btnContTut = (Button) findViewById(R.id.btn_cont_tut);
+        btnContTut.setOnClickListener(this);
 
         imgEdit.setOnClickListener(this);
 
@@ -139,7 +140,7 @@ public class ProfileActivity extends AppCompatActivity implements UserResponse.I
         if (userId == userDetails.getUserId()) {
             isMine = true;
             invalidateOptionsMenu();
-            btnReqSession.setVisibility(View.GONE);
+            btnContTut.setVisibility(View.GONE);
             setupDetails(userDetails);
             LangaugesResponse.loadAllLanguages(this);
             CourseResponse.loadAllCourses(this);
@@ -658,6 +659,12 @@ public class ProfileActivity extends AppCompatActivity implements UserResponse.I
             case R.id.img_edit:
                 Intent gallery_Intent = new Intent(getApplicationContext(), GalleryUtil.class);
                 startActivityForResult(gallery_Intent, GALLERY_ACTIVITY_CODE);
+                break;
+
+            case R.id.btn_cont_tut:
+                Bundle bundle = new Bundle();
+                bundle.putInt("userId", userDetails.getUserId());
+                AppHelper.slideInStayStill(this, RequestSessionActivity.class, bundle);
                 break;
         }
     }

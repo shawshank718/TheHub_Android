@@ -14,8 +14,11 @@ import android.widget.Toast;
 import com.group6.thehub.R;
 import com.group6.thehub.Rest.models.Course;
 import com.group6.thehub.Rest.models.CourseDetails;
+import com.group6.thehub.Rest.models.UserDetails;
 import com.group6.thehub.Rest.models.UserSearchDetails;
 import com.group6.thehub.Rest.responses.CourseResponse;
+import com.group6.thehub.Rest.responses.FavoritesResponse;
+import com.group6.thehub.Rest.responses.UserResponse;
 import com.group6.thehub.Rest.responses.UserSearchResponse;
 import com.group6.thehub.UserSearchResponseAdapter;
 import com.quinny898.library.persistentsearch.SearchBox;
@@ -24,7 +27,12 @@ import com.quinny898.library.persistentsearch.SearchResult;
 import java.util.ArrayList;
 import java.util.List;
 
-public class SearchResultsActivity extends AppCompatActivity implements CourseResponse.CourseDetailsListener, UserSearchResponse.UserSearchResponseListener {
+public class SearchResultsActivity extends AppCompatActivity implements CourseResponse.CourseDetailsListener, UserSearchResponse.UserSearchResponseListener, FavoritesResponse.FavoritesListener {
+
+    private final String SEARCH_TYPE = "search_type";
+    private final String COURSE_SEARCH = "course_search";
+    private final String FAVORITES = "favorites";
+    private String pageType = "";
 
     private String searchCourseCode;
     private Toolbar toolbar;
@@ -35,6 +43,8 @@ public class SearchResultsActivity extends AppCompatActivity implements CourseRe
     private boolean isSearchOpened;
     private List<Course> courses = new ArrayList<>();
     private List<String> courseCodes = new ArrayList<>();
+    private List<UserDetails> favorites;
+    private UserDetails userDetails;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -45,17 +55,37 @@ public class SearchResultsActivity extends AppCompatActivity implements CourseRe
         setSupportActionBar(toolbar);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         getSupportActionBar().setDisplayShowHomeEnabled(true);
-        searchCourseCode = getIntent().getStringExtra("search");
-        setTitle(searchCourseCode);
+        userDetails = UserResponse.getUserDetails(this);
         searchBox = (SearchBox) findViewById(R.id.searchbox);
-        setUpSearchBox();
         imgTint = (ImageView) findViewById(R.id.imgTint);
         rvSearchResults = (RecyclerView)findViewById(R.id.rv_search_results);
         LinearLayoutManager llm = new LinearLayoutManager(this);
         rvSearchResults.setLayoutManager(llm);
+
+        if (getIntent().getStringExtra(SEARCH_TYPE).equals(COURSE_SEARCH)) {
+            searchResultsCourseCode();
+        } else if(getIntent().getStringExtra(SEARCH_TYPE).equals(FAVORITES)) {
+            searchFavorites();
+        }
+
+
+    }
+
+    private void searchFavorites() {
+        pageType = FAVORITES;
+        invalidateOptionsMenu();
+        setTitle(R.string.favorites);
+        FavoritesResponse.getFavorites(this, userDetails.getUserId());
+    }
+
+    private void searchResultsCourseCode() {
+        pageType = COURSE_SEARCH;
+        invalidateOptionsMenu();
+        searchCourseCode = getIntent().getStringExtra("search");
+        setTitle(searchCourseCode);
+        setUpSearchBox();
         CourseResponse.loadAllCourses(this);
         UserSearchResponse.searchByCourseCode(this, searchCourseCode);
-
     }
 
     public void setUpSearchBox() {
@@ -131,6 +161,19 @@ public class SearchResultsActivity extends AppCompatActivity implements CourseRe
     }
 
     @Override
+    public boolean onPrepareOptionsMenu(Menu menu) {
+
+        if (pageType.equals(FAVORITES)) {
+            menu.getItem(0).setVisible(false);
+            return true;
+        } else if (pageType.equals(COURSE_SEARCH)) {
+            menu.getItem(0).setVisible(true);
+            return true;
+        }
+        return super.onPrepareOptionsMenu(menu);
+    }
+
+    @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         // Handle action bar item clicks here. The action bar will
         // automatically handle clicks on the Home/Up button, so long
@@ -178,6 +221,23 @@ public class SearchResultsActivity extends AppCompatActivity implements CourseRe
 
     @Override
     public void onUserSearchFailed(String message) {
+        Toast.makeText(this, message, Toast.LENGTH_LONG).show();
+    }
+
+    @Override
+    public void onFavoritesRetrieved(List<UserDetails> users) {
+        this.favorites = users;
+        adapter = new UserSearchResponseAdapter(this, favorites);
+        rvSearchResults.setAdapter(adapter);
+    }
+
+    @Override
+    public void onFavoriteActionSuccess(String message) {
+
+    }
+
+    @Override
+    public void onFavoriteCallFail(String message) {
         Toast.makeText(this, message, Toast.LENGTH_LONG).show();
     }
 }

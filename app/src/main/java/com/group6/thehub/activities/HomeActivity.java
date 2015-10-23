@@ -42,6 +42,9 @@ import de.hdodenhof.circleimageview.CircleImageView;
 public class HomeActivity extends AppCompatActivity implements View.OnClickListener, CourseResponse.CourseDetailsListener, NavigationView.OnNavigationItemSelectedListener, FavoritesResponse.FavoritesListener{
 
     private static final String LOG_TAG = "HomeActivity";
+    private final String SEARCH_TYPE = "search_type";
+    private final String COURSE_SEARCH = "course_search";
+    private final String FAVORITES = "favorites";
 
     private DrawerLayout mDrawerLayout;
     AppHelper appHelper = new AppHelper(this);
@@ -123,13 +126,6 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
         CourseResponse.loadAllCourses(this);
     }
 
-    @Override
-    public void onWindowFocusChanged(boolean hasFocus) {
-        super.onWindowFocusChanged(hasFocus);
-
-        Log.d(LOG_TAG, AppHelper.convertPixtoDip(this, reltvFavs.getHeight()) + "");
-    }
-
     public void updateUserDetails() {
         setTitle("Hi " +userDetails.getFirstName());
         tvEmail.setText(userDetails.getEmail());
@@ -201,6 +197,7 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
             @Override
             public void onResultClick(SearchResult searchResult) {
                 String searchCourseCode = (String) searchResult.getTag();
+                searchBox.setSearchString("");
                 goToSearchResultActivity(searchCourseCode);
             }
         });
@@ -219,8 +216,6 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
         });
     }
 
-
-
     protected void closeSearch() {
         searchBox.hideCircularly(this);
         imgTint.setVisibility(View.GONE);
@@ -233,9 +228,17 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
 
     @Override
     public void onClick(View view) {
-        switch (view.getId()) {
+        int id = view.getId();
 
+        if (id == R.id.btn_more) {
+            goToFavorites();
         }
+    }
+
+    private void goToFavorites() {
+        Bundle bundle = new Bundle();
+        bundle.putString(SEARCH_TYPE, FAVORITES);
+        AppHelper.slideInStayStill(this, SearchResultsActivity.class, bundle);
     }
 
     @Override
@@ -252,6 +255,7 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
 
     private void goToSearchResultActivity(String searchCourseCode) {
         Bundle bundle = new Bundle();
+        bundle.putString(SEARCH_TYPE, COURSE_SEARCH);
         bundle.putString("search", searchCourseCode);
         AppHelper.slideInStayStill(this, SearchResultsActivity.class, bundle);
     }
@@ -314,9 +318,16 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
         } else {
             btnMore.setVisibility(View.VISIBLE);
         }
-        int length = users.size() > 3 ? 2 : users.size();
+        int length = users.size() > 3 ? 3 : users.size();
         for (int i = 0; i < length; i++) {
             lilyFavs.getChildAt(i).setVisibility(View.VISIBLE);
+            lilyFavs.getChildAt(i).setTag(users.get(i));
+            lilyFavs.getChildAt(i).setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    favClicked((UserDetails) v.getTag());
+                }
+            });
             FavoritesViewHolder fvh = new FavoritesViewHolder(lilyFavs.getChildAt(i));
             fvh.tvName.setText(users.get(i).getFullName());
             Picasso.with(this)
@@ -325,6 +336,12 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
                     .error(R.drawable.ic_account_circle_grey_48dp)
                     .into(fvh.imgUser);
         }
+    }
+
+    private void favClicked(UserDetails user) {
+        Bundle bundle = new Bundle();
+        bundle.putInt("userId", user.getUserId());
+        AppHelper.slideInStayStill(this, RequestSessionActivity.class, bundle);
     }
 
     private class FavoritesViewHolder {
