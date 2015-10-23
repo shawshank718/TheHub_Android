@@ -21,8 +21,10 @@ import com.group6.thehub.AppHelper;
 import com.group6.thehub.R;
 import com.group6.thehub.Rest.models.Course;
 import com.group6.thehub.Rest.models.Location;
+import com.group6.thehub.Rest.models.Session;
 import com.group6.thehub.Rest.models.UserDetails;
 import com.group6.thehub.Rest.responses.LocationResponse;
+import com.group6.thehub.Rest.responses.SessionResponse;
 import com.group6.thehub.Rest.responses.UserResponse;
 import com.group6.thehub.fragments.DateTimePickerDialogFragment;
 import com.parse.ParsePush;
@@ -37,7 +39,7 @@ import java.util.List;
 
 import de.hdodenhof.circleimageview.CircleImageView;
 
-public class RequestSessionActivity extends AppCompatActivity implements View.OnClickListener, DatePickerDialog.OnDateSetListener, TimePickerDialog.OnTimeSetListener, UserResponse.UserDetailsQueryListener, LocationResponse.LocationResponseListener {
+public class RequestSessionActivity extends AppCompatActivity implements View.OnClickListener, DatePickerDialog.OnDateSetListener, TimePickerDialog.OnTimeSetListener, UserResponse.UserDetailsQueryListener, LocationResponse.LocationResponseListener, SessionResponse.SessionResponseListner {
 
     private static final String LOG_TAG = "RequestSessionActivity";
 
@@ -55,8 +57,10 @@ public class RequestSessionActivity extends AppCompatActivity implements View.On
     private UserDetails user_cur;
     private UserDetails user_oth;
     private int user_oth_id;
+    private int session_id;
     private boolean fromStart;
     private boolean fromEnd;
+    private Session session;
     private List<Location> locations;
     private List<Course> courses;
     private List<String> locationNames;
@@ -77,10 +81,18 @@ public class RequestSessionActivity extends AppCompatActivity implements View.On
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_request_session);
+        setUpToolbar();
         user_cur = UserResponse.getUserDetails(this);
-        user_oth_id = getIntent().getIntExtra("userId", -1);
-        instantiateViews();
-        setUpViews();
+        session_id = getIntent().getIntExtra("sessionId", -1);
+        if(session_id != -1) {
+            SessionResponse.getSession(this, session_id);
+        } else {
+            user_oth_id = getIntent().getIntExtra("userId", -1);
+            instantiateViews();
+            setUpViews();
+        }
+
+
     }
 
     private void instantiateViews() {
@@ -102,11 +114,16 @@ public class RequestSessionActivity extends AppCompatActivity implements View.On
     }
 
     private void setUpViews() {
-        setUpToolbar();
         setupDateView();
         setUpTimeView();
         setupProfileView();
         setupLocations();
+        setUpActionButton();
+    }
+
+    private void setUpActionButton() {
+        btn_action.setText("REQUEST SESSION");
+        btn_action.setTag("CREATE");
     }
 
     private void setUpToolbar() {
@@ -232,7 +249,7 @@ public class RequestSessionActivity extends AppCompatActivity implements View.On
         }
 
         if (id == R.id.btn_action) {
-            performRelevantAction();
+            performRelevantAction(v);
         }
 
 
@@ -257,7 +274,14 @@ public class RequestSessionActivity extends AppCompatActivity implements View.On
         dateTimePickerDialogFragment.show(getSupportFragmentManager(), "time_picker_end");
     }
 
-    private void performRelevantAction() {
+    private void performRelevantAction(View v) {
+        if (v.getTag() == "CREATE") {
+            studentId = user_cur.getUserId();
+            tutorId = user_oth.getUserId();
+            locationId = (int) spn_location.getSelectedItemId()+1;
+            courseCode = spn_course.getSelectedItem().toString();
+            SessionResponse.createSession(this, studentId, tutorId, locationId, courseCode, startTime, endTime, "CREATE");
+        }
         sendPushNotification();
     }
 
@@ -349,5 +373,34 @@ public class RequestSessionActivity extends AppCompatActivity implements View.On
     @Override
     public void onLocationFail(String message) {
 
+    }
+
+    @Override
+    public void onSessionsRetrieved(List<Session> sessions) {
+
+    }
+
+    @Override
+    public void onSessionRetrieved(Session session) {
+        this.session = session;
+        if (session.getStudentid() == user_cur.getUserId()) {
+            user_oth_id = session.getTutorId();
+        } else {
+            user_oth_id = session.getStudentid();
+        }
+        instantiateViews();
+        setUpViews();
+
+    }
+
+    @Override
+    public void onSessionActionSuccess(Session session) {
+        Toast.makeText(this, "A request has been sent to the tutor.", Toast.LENGTH_LONG).show();
+        goBack();
+    }
+
+    @Override
+    public void onSessionFails(String message) {
+        Toast.makeText(this, message, Toast.LENGTH_LONG).show();
     }
 }

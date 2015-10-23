@@ -272,6 +272,10 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
                 bundle.putInt("userId", userDetails.getUserId());
                 AppHelper.slideInStayStill(this, ProfileActivity.class, bundle);
                 return true;
+            case R.id.sessions:
+                AppHelper.slideInStayStill(this, SessionsActivity.class, null);
+                return true;
+
             case R.id.logout:
                 UserResponse.callLogout(getApplicationContext());
                 ParsePush.unsubscribeInBackground(userDetails.getEmail());

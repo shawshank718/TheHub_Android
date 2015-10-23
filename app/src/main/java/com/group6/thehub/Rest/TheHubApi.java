@@ -6,6 +6,7 @@ import com.group6.thehub.Rest.responses.CourseResponse;
 import com.group6.thehub.Rest.responses.FavoritesResponse;
 import com.group6.thehub.Rest.responses.LangaugesResponse;
 import com.group6.thehub.Rest.responses.LocationResponse;
+import com.group6.thehub.Rest.responses.SessionResponse;
 import com.group6.thehub.Rest.responses.UserResponse;
 import com.group6.thehub.Rest.responses.UserSearchResponse;
 import com.squareup.okhttp.Call;
@@ -77,5 +78,11 @@ public interface TheHubApi {
     @FormUrlEncoded
     @POST("/theHub/sessions.php")
     void createSession(@Field("studentId") int studentId, @Field("tutorId") int tutorId, @Field("locationId") int locationId, @Field("courseCode") String courseCode,
-                       @Field("startTime") long startTime, @Field("endTime") long endTime, @Field("ACTION") String action);
+                       @Field("startTime") long startTime, @Field("endTime") long endTime, @Field("ACTION") String action, Callback<SessionResponse> response);
+
+    @GET("/theHub/sessions.php")
+    void getSession(@Query("sessionId") int sessionId, Callback<SessionResponse> response);
+
+    @GET("/theHub/sessions.php")
+    void getUserSessions(@Query("userId") int userId, Callback<SessionResponse> response);
 }

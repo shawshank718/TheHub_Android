@@ -63,4 +63,5 @@ Aenean non cursus est. Fusce feugiat ex at suscipit suscipit. In tempus magna se
     <string name="con_tut">Contact Tutor</string>
     <string name="location">Location</string>
     <string name="course">Course</string>
+    <string name="title_activity_sessions">SessionsActivity</string>
 </resources>

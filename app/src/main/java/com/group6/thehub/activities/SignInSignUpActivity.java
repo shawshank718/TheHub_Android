@@ -4,6 +4,7 @@ import android.content.Intent;
 import android.os.Build;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.widget.Toast;
 
@@ -13,7 +14,9 @@ import com.group6.thehub.Rest.models.UserDetails;
 import com.group6.thehub.Rest.responses.UserResponse;
 import com.group6.thehub.fragments.SignInFragment;
 import com.group6.thehub.fragments.SignUpFragment;
+import com.parse.ParseException;
 import com.parse.ParsePush;
+import com.parse.SaveCallback;
 
 public class SignInSignUpActivity extends AppCompatActivity implements SignInFragment.OnFragmentInteractionListener, SignUpFragment.OnFragmentInteractionListener, UserResponse.UserVerificationListener {
 
@@ -69,18 +72,31 @@ public class SignInSignUpActivity extends AppCompatActivity implements SignInFra
 
     @Override
     public void onRegistrationComplete(UserDetails userDetails) {
+        String email = userDetails.getEmail();
+        ParsePush.subscribeInBackground(email, new SaveCallback() {
+            @Override
+            public void done(ParseException e) {
+                Log.d("SignInActivity", "subscribed");
+            }
+        });
         goToHome(userDetails);
     }
 
     @Override
     public void onSignInComplete(UserDetails userDetails) {
+        String channel = userDetails.getFullName()+""+userDetails.getUserId();
+        ParsePush.subscribeInBackground(channel, new SaveCallback() {
+            @Override
+            public void done(ParseException e) {
+                Log.d("SignInActivity", "subscribed");
+            }
+        });
         goToHome(userDetails);
     }
 
 
     public void goToHome(UserDetails userDetails) {
         UserResponse.saveUserDetails(this, userDetails);
-        ParsePush.subscribeInBackground(userDetails.getEmail());
         Intent intent = new Intent(this, HomeActivity.class);
         appHelper.slideUpPushUp(intent);
         finish();
