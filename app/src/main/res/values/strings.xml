@@ -37,4 +37,30 @@
     <string name="placeholder_qual">Master of Professional Engineering (Software)</string>
     <string name="courses">Courses</string>
     <string name="placeholder_course">MATH1001: Differential Calculus</string>
+    <string name="action_favorite">Favorite</string>
+    <string name="action_edit">Edit</string>
+    <string name="request_session">REQUEST SESSION</string>
+    <string name="save_changes">SAVE CHANGES</string>
+    <string name="lorem_ipsum">Lorem ipsum dolor sit amet, consectetur adipiscing elit. Aliquam quis tellus vel arcu consectetur condimentum. Morbi rutrum orci eget dui faucibus feugiat. Cras quis urna diam. Aliquam leo dui, tristique sed maximus at, faucibus eget dui. Morbi efficitur sem velit, ac lacinia massa interdum sit amet. Maecenas ex augue, euismod lobortis vulputate at, varius luctus diam. Etiam vulputate semper lacus, et pharetra magna convallis ac. Curabitur consectetur ante justo, ac tristique nunc lacinia in. Nunc laoreet risus at elit egestas, quis sodales leo egestas. Vestibulum congue ligula eu eros interdum, ac pellentesque dolor bibendum. Mauris a erat nec metus feugiat sollicitudin.
+
+In venenatis at ante sit amet consequat. Aliquam maximus blandit velit eu volutpat. Morbi tellus ante, lacinia in fringilla vel, cursus vel magna. Integer venenatis tincidunt lobortis. Vestibulum quis elit congue, aliquet urna quis, hendrerit metus. Nulla facilisis convallis erat, sit amet posuere augue dictum gravida. Praesent molestie finibus aliquam. Praesent varius hendrerit ligula, eget dictum sapien egestas at.
+
+Aenean non cursus est. Fusce feugiat ex at suscipit suscipit. In tempus magna sed dolor cursus pulvinar eget vel lacus. Phasellus vulputate aliquam ipsum, ac euismod est euismod eget. Nam laoreet justo eget auctor efficitur. Fusce sit amet porta felis. Pellentesque tempor mi est. Aliquam sit amet mauris in justo vestibulum blandit. Nullam metus risus, tristique a libero non, ullamcorper suscipit libero. Pellentesque habitant morbi tristique senectus et netus et malesuada fames ac turpis egestas. Donec vehicula commodo odio, eu sodales urna vestibulum nec. Aenean vulputate arcu facilisis sem eleifend sollicitudin. Pellentesque ut dui magna. Phasellus sodales nisi vitae ligula aliquet accumsan eu non nisl. Suspendisse et nisl maximus, vulputate magna et, aliquam ligula.</string>
+    <string name="action_save">SAVE</string>
+    <string name="languages">Languages</string>
+    <string name="contact">Contact</string>
+    <string name="phone">Phone</string>
+    <string name="req_session">REQUEST SESSION</string>
+    <string name="title_activity_search_results">SearchResultsActivity</string>
+    <string name="chages_updated">Your details have been updated.</string>
+    <string name="rec_for_you">Recommended for you</string>
+    <string name="no_recs">Add courses to your profile to get recommendations.</string>
+    <string name="favorites">Favorites</string>
+    <string name="title_activity_request_session">RequestSessionActivity</string>
+    <string name="day">Day</string>
+    <string name="start_time">Start Time</string>
+    <string name="end_time">End Time</string>
+    <string name="con_tut">Contact Tutor</string>
+    <string name="location">Location</string>
+    <string name="course">Course</string>
 </resources>

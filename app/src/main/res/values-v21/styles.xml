@@ -2,6 +2,9 @@
 <resources>
     <style name="AppTheme" parent="AppTheme.Base">
         <!-- Customize your theme using Material Design here. -->
+    </style>
+
+    <style name="TransStatusBar" parent="AppTheme">
         <item name="android:statusBarColor">@android:color/transparent</item>
     </style>
 </resources>

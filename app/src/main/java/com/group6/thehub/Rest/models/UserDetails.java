@@ -2,6 +2,8 @@ package com.group6.thehub.Rest.models;
 
 import org.parceler.Parcel;
 
+import java.util.ArrayList;
+
 /**
  * Created by sathwiksingari on 9/17/15.
  */
@@ -9,20 +11,32 @@ import org.parceler.Parcel;
 @Parcel
 public class UserDetails {
 
-    long userId;
+    int userId;
     String firstName;
     String lastName;
     String email;
     String type;
     ImageDetails image;
+    String qualification;
+    int star5;
+    int star4;
+    int star3;
+    int star2;
+    int star1;
+    float rating;
+    ArrayList<Language> languages;
+    ArrayList<Course> courses;
+    String phone;
+    boolean favorite;
 
-    public long getUserId() {
+    public String getPhone() {
+        return phone.replace("a","");
+    }
+
+    public int getUserId() {
         return userId;
     }
 
-    public void setUserId(long userId) {
-        this.userId = userId;
-    }
 
     public UserDetails() {
     }
@@ -31,16 +45,12 @@ public class UserDetails {
         return firstName;
     }
 
-    public void setFirstName(String firstName) {
-        this.firstName = firstName;
-    }
-
     public String getLastName() {
         return lastName;
     }
 
-    public void setLastName(String lastName) {
-        this.lastName = lastName;
+    public String getFullName() {
+        return this.firstName+ " "+this.lastName;
     }
 
     public String getEmail() {
@@ -55,10 +65,6 @@ public class UserDetails {
         return type;
     }
 
-    public void setType(String type) {
-        this.type = type;
-    }
-
     public ImageDetails getImage() {
         return image;
     }
@@ -67,4 +73,47 @@ public class UserDetails {
         this.image = image;
     }
 
+    public String getQualification() {
+        return qualification;
+    }
+
+    public int getStar5() {
+        return star5;
+    }
+
+    public int getStar4() {
+        return star4;
+    }
+
+    public int getStar3() {
+        return star3;
+    }
+
+    public int getStar2() {
+        return star2;
+    }
+
+    public int getStar1() {
+        return star1;
+    }
+
+    public float getRating() {
+        return rating;
+    }
+
+    public ArrayList<Language> getLanguages() {
+        return languages;
+    }
+
+    public ArrayList<Course> getCourses() {
+        return courses;
+    }
+
+    public boolean isFavorite() {
+        return favorite;
+    }
+
+    public void setFavorite(boolean favorite) {
+        this.favorite = favorite;
+    }
 }

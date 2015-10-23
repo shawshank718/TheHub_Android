@@ -1,9 +1,9 @@
 <android.support.v4.widget.DrawerLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/drawer_layout"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:fitsSystemWindows="true">
 
     <RelativeLayout
@@ -12,53 +12,145 @@
         android:layout_height="match_parent"
         tools:context="com.group6.thehub.activities.HomeActivity">
 
-        <ImageView
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:id="@+id/imgTint"
-            android:src="@color/black_55"
-            android:visibility="gone"
-            android:layout_centerVertical="true"
-            android:layout_centerHorizontal="true" />
 
-        <com.quinny898.library.persistentsearch.SearchBox
-            android:layout_width="wrap_content"
-            android:id="@+id/searchbox"
-            android:layout_height="wrap_content"
-            android:visibility="gone"
-            android:layout_marginTop="6dp"
-            android:layout_marginLeft="6dp"
-            android:layout_marginRight="6dp"
-            android:layout_alignParentLeft="true"
-            android:layout_alignParentTop="true" />
-
-        <include android:id="@+id/appBar"
+        <include
+            android:id="@+id/appBar"
             layout="@layout/toolbar" />
 
+        <com.quinny898.library.persistentsearch.SearchBox
+            android:id="@+id/searchbox"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentLeft="true"
+            android:layout_alignParentTop="true"
+            android:layout_marginLeft="-6dp"
+            android:layout_marginRight="-6dp"
+            android:layout_marginTop="-6dp"
+            android:elevation="8dp"
+            android:visibility="gone" />
+
+        <RelativeLayout
+            android:id="@+id/reltv_favs"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/appBar"
+            android:layout_marginTop="8dp"
+            android:minHeight="150dp">
+
+            <TextView
+                android:id="@+id/tv_favs"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:fontFamily="roboto light"
+                android:layout_alignParentTop="true"
+                android:text="@string/favorites"
+                android:textColor="@color/black"
+                android:gravity="center_vertical"
+                android:textSize="20sp"
+                android:maxLines="1"
+                android:layout_marginRight="16dp"
+                android:layout_marginLeft="16dp"
+                android:layout_marginBottom="8dp"/>
+
+            <LinearLayout
+                android:id="@+id/lily_favs"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:layout_below="@+id/tv_favs">
+
+                <include
+                    android:id="@+id/fav_item_1"
+                    layout="@layout/favorite_item"
+                    android:layout_width="0dp"
+                    android:layout_height="match_parent"
+                    android:layout_weight="1" />
+
+                <include
+                    android:id="@+id/fav_item_2"
+                    layout="@layout/favorite_item"
+                    android:layout_width="0dp"
+                    android:layout_height="match_parent"
+                    android:layout_weight="1" />
+
+                <include
+                    android:id="@+id/fav_item_3"
+                    layout="@layout/favorite_item"
+                    android:layout_width="0dp"
+                    android:layout_height="match_parent"
+                    android:layout_weight="1" />
+
+            </LinearLayout>
+
+            <Button
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="More..."
+                android:id="@+id/btn_more"
+                android:layout_alignParentRight="true"
+                android:layout_below="@+id/lily_favs"
+                android:textColor="@color/primary_color"
+                android:background="?attr/selectableItemBackground"
+                android:layout_marginRight="8dp"/>
+
+        </RelativeLayout>
+
+        <View
+            android:id="@+id/divider1"
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:background="@color/md_grey_500"
+            android:layout_below="@+id/reltv_favs"/>
+
+        <TextView
+            android:id="@+id/tv_rec"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:fontFamily="roboto light"
+            android:layout_below="@+id/divider1"
+            android:text="@string/rec_for_you"
+            android:textColor="@color/black"
+            android:gravity="center_vertical"
+            android:textSize="20sp"
+            android:maxLines="1"
+            android:layout_marginTop="8dp"
+            android:layout_marginRight="16dp"
+            android:layout_marginLeft="16dp"/>
 
 
+        <TextView
+            android:id="@+id/tv_rec_msg"
+            android:layout_width="200dp"
+            android:layout_height="wrap_content"
+            android:fontFamily="roboto light"
+            android:layout_below="@+id/tv_rec"
+            android:text="@string/no_recs"
+            android:textColor="@color/black"
+            android:gravity="center_vertical"
+            android:textSize="14sp"
+            android:maxLines="2"
+            android:layout_centerHorizontal="true"
+            android:layout_marginTop="48dp"/>
 
-
+        <ImageView
+            android:id="@+id/imgTint"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_centerHorizontal="true"
+            android:layout_centerVertical="true"
+            android:src="@color/black_55"
+            android:visibility="gone" />
 
     </RelativeLayout>
 
     <android.support.design.widget.NavigationView
         android:id="@+id/navigation_view"
-        android:layout_height="match_parent"
         android:layout_width="wrap_content"
+        android:layout_height="match_parent"
         android:layout_gravity="start"
         app:headerLayout="@layout/drawer_header"
         app:itemTextColor="@color/black_85"
-        app:menu = "@menu/drawer"/>
-
-    <!--<fragment-->
-        <!--android:id="@+id/fragment_navigation_drawer"-->
-        <!--android:layout_width="320dp"-->
-        <!--android:layout_height="match_parent"-->
-        <!--android:layout_gravity = "start"-->
-        <!--app:layout = "@layout/fragment_navigation_drawer"-->
-        <!--android:name="com.group6.thehub.fragments.NavigationDrawerFragment"-->
-        <!--tools:layout = "@layout/fragment_navigation_drawer" />-->
+        app:menu="@menu/drawer" />
 
 </android.support.v4.widget.DrawerLayout>
 

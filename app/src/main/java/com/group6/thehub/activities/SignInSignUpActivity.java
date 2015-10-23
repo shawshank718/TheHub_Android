@@ -1,8 +1,6 @@
 package com.group6.thehub.activities;
 
-import android.content.Context;
 import android.content.Intent;
-import android.net.Uri;
 import android.os.Build;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -11,15 +9,12 @@ import android.widget.Toast;
 
 import com.group6.thehub.AppHelper;
 import com.group6.thehub.R;
-import com.group6.thehub.Rest.RestClient;
 import com.group6.thehub.Rest.models.UserDetails;
 import com.group6.thehub.Rest.responses.UserResponse;
 import com.group6.thehub.fragments.SignInFragment;
 import com.group6.thehub.fragments.SignUpFragment;
 
-import org.parceler.Parcels;
-
-public class SignInSignUpActivity extends AppCompatActivity implements SignInFragment.OnFragmentInteractionListener, SignUpFragment.OnFragmentInteractionListener, UserResponse.UserResponseListener {
+public class SignInSignUpActivity extends AppCompatActivity implements SignInFragment.OnFragmentInteractionListener, SignUpFragment.OnFragmentInteractionListener, UserResponse.UserVerificationListener {
 
     private AppHelper appHelper;
 
@@ -81,10 +76,6 @@ public class SignInSignUpActivity extends AppCompatActivity implements SignInFra
         goToHome(userDetails);
     }
 
-    @Override
-    public void onImageUpload(UserDetails userDetails) {
-
-    }
 
     public void goToHome(UserDetails userDetails) {
         UserResponse.saveUserDetails(this, userDetails);

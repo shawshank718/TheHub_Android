@@ -6,15 +6,23 @@
     <item
         android:id="@+id/action_favorite"
         android:orderInCategory="100"
-        android:title="@string/action_settings"
+        android:title="@string/action_favorite"
         app:showAsAction="ifRoom"
+        android:visible="false"
         android:icon="@drawable/ic_favorite_outline_white_24dp"/>
 
     <item
         android:id="@+id/action_edit"
         android:orderInCategory="200"
-        android:title="@string/action_settings"
+        android:title="@string/action_edit"
         app:showAsAction="ifRoom"
         android:icon="@drawable/ic_edit_white_24dp"/>
+
+    <item
+        android:id="@+id/action_save"
+        android:orderInCategory="300"
+        android:title="@string/action_save"
+        app:showAsAction="ifRoom"
+        android:visible="false"/>
 
 </menu>
