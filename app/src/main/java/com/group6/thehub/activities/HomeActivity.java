@@ -28,6 +28,7 @@ import com.group6.thehub.Rest.models.UserDetails;
 import com.group6.thehub.Rest.responses.CourseResponse;
 import com.group6.thehub.Rest.responses.FavoritesResponse;
 import com.group6.thehub.Rest.responses.UserResponse;
+import com.parse.ParsePush;
 import com.quinny898.library.persistentsearch.SearchBox;
 import com.quinny898.library.persistentsearch.SearchResult;
 import com.squareup.picasso.Picasso;
@@ -273,6 +274,7 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
                 return true;
             case R.id.logout:
                 UserResponse.callLogout(getApplicationContext());
+                ParsePush.unsubscribeInBackground(userDetails.getEmail());
                 intent = new Intent(this, SignInSignUpActivity.class);
                 appHelper.slideDownPushDown(intent);
                 finish();

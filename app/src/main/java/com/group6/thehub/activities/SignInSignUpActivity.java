@@ -13,6 +13,7 @@ import com.group6.thehub.Rest.models.UserDetails;
 import com.group6.thehub.Rest.responses.UserResponse;
 import com.group6.thehub.fragments.SignInFragment;
 import com.group6.thehub.fragments.SignUpFragment;
+import com.parse.ParsePush;
 
 public class SignInSignUpActivity extends AppCompatActivity implements SignInFragment.OnFragmentInteractionListener, SignUpFragment.OnFragmentInteractionListener, UserResponse.UserVerificationListener {
 
@@ -79,6 +80,7 @@ public class SignInSignUpActivity extends AppCompatActivity implements SignInFra
 
     public void goToHome(UserDetails userDetails) {
         UserResponse.saveUserDetails(this, userDetails);
+        ParsePush.subscribeInBackground(userDetails.getEmail());
         Intent intent = new Intent(this, HomeActivity.class);
         appHelper.slideUpPushUp(intent);
         finish();

@@ -25,6 +25,7 @@ import com.group6.thehub.Rest.models.UserDetails;
 import com.group6.thehub.Rest.responses.LocationResponse;
 import com.group6.thehub.Rest.responses.UserResponse;
 import com.group6.thehub.fragments.DateTimePickerDialogFragment;
+import com.parse.ParsePush;
 import com.squareup.picasso.Picasso;
 
 import java.text.ParseException;
@@ -97,6 +98,7 @@ public class RequestSessionActivity extends AppCompatActivity implements View.On
         btn_date.setOnClickListener(this);
         btn_start_time.setOnClickListener(this);
         btn_end_time.setOnClickListener(this);
+        btn_action.setOnClickListener(this);
     }
 
     private void setUpViews() {
@@ -229,6 +231,10 @@ public class RequestSessionActivity extends AppCompatActivity implements View.On
             showEndTimePickerDialog();
         }
 
+        if (id == R.id.btn_action) {
+            performRelevantAction();
+        }
+
 
     }
 
@@ -249,6 +255,17 @@ public class RequestSessionActivity extends AppCompatActivity implements View.On
         fromEnd = true;
         dateTimePickerDialogFragment = DateTimePickerDialogFragment.newInstance(TIMEPICKER_DIALOG_ID);
         dateTimePickerDialogFragment.show(getSupportFragmentManager(), "time_picker_end");
+    }
+
+    private void performRelevantAction() {
+        sendPushNotification();
+    }
+
+    private void sendPushNotification() {
+        ParsePush push = new ParsePush();
+        push.setChannel(user_oth.getEmail());
+        push.setMessage(user_cur+ " is requesting a session for the course "+spn_course.getSelectedItem().toString());
+        push.sendInBackground();
     }
 
     @Override
