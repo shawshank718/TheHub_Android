@@ -80,6 +80,14 @@ public interface TheHubApi {
     void createSession(@Field("studentId") int studentId, @Field("tutorId") int tutorId, @Field("locationId") int locationId, @Field("courseCode") String courseCode,
                        @Field("startTime") long startTime, @Field("endTime") long endTime, @Field("ACTION") String action, Callback<SessionResponse> response);
 
+    @FormUrlEncoded
+    @POST("/theHub/sessions.php")
+    void acceptFinishSession(@Field("sessionId") int sessionId, @Field("ACTION") String action, Callback<SessionResponse> response);
+
+    @FormUrlEncoded
+    @POST("/theHub/sessions.php")
+    void rateSession(@Field("sessionId") int sessionId, @Field("rating") int rating, @Field("tutorId") int tutorId, @Field("ACTION") String action, Callback<SessionResponse> response);
+
     @GET("/theHub/sessions.php")
     void getSession(@Query("sessionId") int sessionId, Callback<SessionResponse> response);
 

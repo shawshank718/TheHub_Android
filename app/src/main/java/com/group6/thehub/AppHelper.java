@@ -9,6 +9,9 @@ import android.support.v7.app.AppCompatActivity;
 import android.util.DisplayMetrics;
 import android.util.TypedValue;
 
+import java.text.SimpleDateFormat;
+import java.util.Date;
+
 /**
  * Created by sathwiksingari on 9/18/15.
  */
@@ -21,7 +24,7 @@ public class AppHelper {
 
     private static final String USER_PREFS = "com.group6.thehub.user_prefs";
 
-    public static final String END_POINT = "http://10.19.90.100/";
+    public static final String END_POINT = "http://192.168.137.249/"; //"http://10.19.90.100/";
 
     public AppHelper(Context mContext) {
         this.mContext = mContext;
@@ -73,5 +76,17 @@ public class AppHelper {
     public static int convertPixtoDip(Context context, int pixel){
         float scale = getDensity(context);
         return (int)((pixel - 0.5f)/scale);
+    }
+
+    public static String getDate(long epochTime) {
+        SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy");
+        String date = sdf.format(new Date(epochTime * 1000));
+        return date;
+    }
+
+    public static String getTime(long epochTime) {
+        SimpleDateFormat sdf = new SimpleDateFormat("hh:mm a");
+        String time = sdf.format(new Date(epochTime*1000));
+        return time;
     }
 }

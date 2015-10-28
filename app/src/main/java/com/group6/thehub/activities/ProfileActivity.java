@@ -172,6 +172,9 @@ public class ProfileActivity extends AppCompatActivity implements UserResponse.I
         if (userDetails.isFavorite()) {
             invalidateOptionsMenu();
         }
+        if (userDetails.getType().equals("S")) {
+            btnContTut.setVisibility(View.GONE);
+        }
     }
 
     private void addCourses(ArrayList<Course> courses) {

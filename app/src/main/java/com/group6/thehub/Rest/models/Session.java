@@ -6,10 +6,10 @@ package com.group6.thehub.Rest.models;
 public class Session {
 
     int sessionId;
-    int studentid;
+    int studentId;
     int tutorId;
-    ImageDetails image;
-    String name;
+    UserDetails student;
+    UserDetails tutor;
     int locationId;
     String courseCode;
     String status;
@@ -21,20 +21,20 @@ public class Session {
         return sessionId;
     }
 
-    public int getStudentid() {
-        return studentid;
+    public int getStudentId() {
+        return studentId;
     }
 
     public int getTutorId() {
         return tutorId;
     }
 
-    public ImageDetails getImage() {
-        return image;
+    public UserDetails getStudent() {
+        return student;
     }
 
-    public String getName() {
-        return name;
+    public UserDetails getTutor() {
+        return tutor;
     }
 
     public int getLocationId() {

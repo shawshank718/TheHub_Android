@@ -35,7 +35,9 @@
                     android:layout_height="wrap_content"
                     android:layout_weight="2"
                     android:gravity="center_horizontal"
-                    android:orientation="vertical">
+                    android:orientation="vertical"
+                    android:background="?attr/selectableItemBackground"
+                    android:clickable="true">
 
                     <de.hdodenhof.circleimageview.CircleImageView
                         android:id="@+id/profile_image_cur"
@@ -54,7 +56,7 @@
                         android:gravity="center_vertical"
                         android:maxLines="1"
                         android:maxWidth="100dp"
-                        android:text="John Doe"
+                        android:text=""
                         android:textColor="@color/black"
                         android:textSize="14sp" />
                 </LinearLayout>
@@ -71,7 +73,9 @@
                     android:layout_height="wrap_content"
                     android:layout_weight="2"
                     android:gravity="center_horizontal"
-                    android:orientation="vertical">
+                    android:orientation="vertical"
+                    android:background="?attr/selectableItemBackground"
+                    android:clickable="true">
 
                     <de.hdodenhof.circleimageview.CircleImageView
                         android:id="@+id/profile_image_oth"
@@ -90,7 +94,7 @@
                         android:gravity="center_vertical"
                         android:maxLines="1"
                         android:maxWidth="100dp"
-                        android:text="John Doe"
+                        android:text=""
                         android:textColor="@color/black"
                         android:textSize="14sp" />
                 </LinearLayout>
@@ -129,11 +133,11 @@
                         android:layout_height="wrap_content"
                         android:layout_weight="4"
                         android:background="?attr/selectableItemBackground"
-                        android:text="New Button"
-                        android:textColor="@color/primary_color"
-                        android:textSize="20sp"
+                        android:gravity="left|center_vertical"
                         android:paddingLeft="16dp"
-                        android:gravity="left|center_vertical"/>
+                        android:text=""
+                        android:textColor="@color/primary_color"
+                        android:textSize="20sp" />
                 </LinearLayout>
 
                 <LinearLayout
@@ -158,11 +162,11 @@
                         android:layout_height="wrap_content"
                         android:layout_weight="4"
                         android:background="?attr/selectableItemBackground"
-                        android:text="New Button"
-                        android:textColor="@color/primary_color"
-                        android:textSize="20sp"
+                        android:gravity="left|center_vertical"
                         android:paddingLeft="16dp"
-                        android:gravity="left|center_vertical"/>
+                        android:text=""
+                        android:textColor="@color/primary_color"
+                        android:textSize="20sp" />
 
                 </LinearLayout>
 
@@ -188,11 +192,11 @@
                         android:layout_height="wrap_content"
                         android:layout_weight="4"
                         android:background="?attr/selectableItemBackground"
-                        android:text="New Button"
-                        android:textColor="@color/primary_color"
-                        android:textSize="20sp"
+                        android:gravity="left|center_vertical"
                         android:paddingLeft="16dp"
-                        android:gravity="left|center_vertical"/>
+                        android:text=""
+                        android:textColor="@color/primary_color"
+                        android:textSize="20sp" />
 
                 </LinearLayout>
 
@@ -248,13 +252,40 @@
 
             </LinearLayout>
 
+
+            <RatingBar
+                style="@style/StarRatingBar"
+                android:id="@+id/rbar_tutor"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_horizontal"
+                android:layout_marginTop="16dp"
+                android:numStars="5"
+                android:stepSize="1.0"
+                android:visibility="gone"/>
+
             <Button
+                android:id="@+id/btn_action"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="ACTION"
-                android:id="@+id/btn_action"
+                android:layout_marginTop="16dp"
                 android:background="@drawable/primary_color_btn"
-                android:layout_marginTop="16dp"/>
+                android:text="ACTION" />
+
+
+            <TextView
+                android:id="@+id/tv_status_info"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_horizontal"
+                android:layout_marginLeft="16dp"
+                android:layout_marginRight="16dp"
+                android:layout_marginTop="16dp"
+                android:gravity="center_horizontal"
+                android:text="New Text"
+                android:textAppearance="?android:attr/textAppearanceMedium"
+                android:textColor="@color/black"
+                android:visibility="gone" />
 
         </LinearLayout>
 

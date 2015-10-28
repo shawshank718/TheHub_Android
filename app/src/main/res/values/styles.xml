@@ -57,4 +57,10 @@
         <item name="colorControlNormal">@color/white</item>
     </style>
 
+    <style name="StarRatingBar" parent="@android:style/Widget.RatingBar">
+        <item name="android:progressDrawable">@drawable/ratingbar_selector</item>
+        <item name="android:minHeight">48dip</item>
+        <item name="android:maxHeight">48dip</item>
+    </style>
+
 </resources>

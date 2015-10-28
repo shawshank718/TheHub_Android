@@ -12,6 +12,8 @@ import android.view.View;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.DatePicker;
+import android.widget.LinearLayout;
+import android.widget.RatingBar;
 import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.TimePicker;
@@ -39,7 +41,7 @@ import java.util.List;
 
 import de.hdodenhof.circleimageview.CircleImageView;
 
-public class RequestSessionActivity extends AppCompatActivity implements View.OnClickListener, DatePickerDialog.OnDateSetListener, TimePickerDialog.OnTimeSetListener, UserResponse.UserDetailsQueryListener, LocationResponse.LocationResponseListener, SessionResponse.SessionResponseListner {
+public class RequestSessionActivity extends AppCompatActivity implements View.OnClickListener, DatePickerDialog.OnDateSetListener, TimePickerDialog.OnTimeSetListener, UserResponse.UserDetailsQueryListener, LocationResponse.LocationResponseListener, SessionResponse.SessionResponseListner, RatingBar.OnRatingBarChangeListener {
 
     private static final String LOG_TAG = "RequestSessionActivity";
 
@@ -49,10 +51,12 @@ public class RequestSessionActivity extends AppCompatActivity implements View.On
 
     private Toolbar toolbar;
     private CircleImageView profile_image_cur, profile_image_oth;
-    private TextView tv_name_cur, tv_name_oth;
+    private TextView tv_name_cur, tv_name_oth, tv_status_info;
     private Button btn_date, btn_start_time, btn_end_time, btn_action;
     private Spinner spn_course,spn_location;
+    private RatingBar rbar_tutor;
     private DateTimePickerDialogFragment dateTimePickerDialogFragment;
+    private LinearLayout lily_user_cur, lily_user_oth;
 
     private UserDetails user_cur;
     private UserDetails user_oth;
@@ -67,6 +71,8 @@ public class RequestSessionActivity extends AppCompatActivity implements View.On
     private List<String> courseCodes;
     private ArrayAdapter<String> adapter_locations;
     private ArrayAdapter<String> adapter_courses;
+    private boolean is_student = false;
+    private int rating;
 
     /*POST arguments*/
     private int studentId;
@@ -82,7 +88,6 @@ public class RequestSessionActivity extends AppCompatActivity implements View.On
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_request_session);
         instantiateViews();
-        setUpToolbar();
         user_cur = UserResponse.getUserDetails(this);
         session_id = getIntent().getIntExtra("sessionId", -1);
         if(session_id != -1) {
@@ -91,8 +96,6 @@ public class RequestSessionActivity extends AppCompatActivity implements View.On
             user_oth_id = getIntent().getIntExtra("userId", -1);
             setUpViews();
         }
-
-
     }
 
     private void instantiateViews() {
@@ -107,10 +110,19 @@ public class RequestSessionActivity extends AppCompatActivity implements View.On
         spn_course = (Spinner) findViewById(R.id.spn_course);
         spn_location = (Spinner) findViewById(R.id.spn_location);
         btn_action = (Button) findViewById(R.id.btn_action);
+        tv_status_info = (TextView) findViewById(R.id.tv_status_info);
+        rbar_tutor = (RatingBar) findViewById(R.id.rbar_tutor);
+        lily_user_cur = (LinearLayout) findViewById(R.id.lily_profile_cur);
+        lily_user_oth = (LinearLayout) findViewById(R.id.lily_profile_oth);
         btn_date.setOnClickListener(this);
         btn_start_time.setOnClickListener(this);
         btn_end_time.setOnClickListener(this);
         btn_action.setOnClickListener(this);
+        lily_user_cur.setOnClickListener(this);
+        lily_user_oth.setOnClickListener(this);
+        rbar_tutor.setOnRatingBarChangeListener(this);
+
+        setUpToolbar();
     }
 
     private void setUpViews() {
@@ -122,8 +134,77 @@ public class RequestSessionActivity extends AppCompatActivity implements View.On
     }
 
     private void setUpActionButton() {
-        btn_action.setText("REQUEST SESSION");
-        btn_action.setTag("CREATE");
+        if (session_id == -1) {
+            btn_action.setText("REQUEST SESSION");
+            btn_action.setTag("CREATE");
+        } else {
+            btn_date.setClickable(false);
+            btn_start_time.setClickable(false);
+            btn_end_time.setClickable(false);
+            spn_course.setEnabled(false);
+            spn_location.setEnabled(false);
+            if (is_student) {
+                String status = session.getStatus();
+                switch (status) {
+                    case "P":
+                        tv_status_info.setText("Waiting for the tutors decision.");
+                        tv_status_info.setVisibility(View.VISIBLE);
+                        btn_action.setVisibility(View.GONE);
+                        break;
+                    case "A":
+                        tv_status_info.setText("The tutor has accepted your session");
+                        tv_status_info.setVisibility(View.VISIBLE);
+                        btn_action.setVisibility(View.GONE);
+                        break;
+                    case "C":
+                        tv_status_info.setText("This session has ended");
+                        tv_status_info.setVisibility(View.VISIBLE);
+                        btn_action.setText("Submit rating");
+                        btn_action.setTag("RATING");
+                        rbar_tutor.setVisibility(View.VISIBLE);
+                        break;
+                    case "R":
+                        tv_status_info.setText("This session has been rated");
+                        tv_status_info.setVisibility(View.VISIBLE);
+                        rbar_tutor.setVisibility(View.VISIBLE);
+                        rbar_tutor.setRating(session.getRating());
+                        rbar_tutor.setIsIndicator(true);
+                        btn_action.setVisibility(View.GONE);
+                }
+            } else {
+                String status = session.getStatus();
+                switch (status) {
+                    case "P":
+                        btn_action.setText("ACCEPT SESSION");
+                        btn_action.setTag("ACCEPT");
+                        break;
+                    case "A":
+                        tv_status_info.setText("You have accepted this session");
+                        tv_status_info.setVisibility(View.VISIBLE);
+                        if (System.currentTimeMillis() / 1000 > session.getEndTime()) {
+                            btn_action.setText("FINISH SESSION");
+                            btn_action.setTag("FINISH");
+                        } else {
+                            btn_action.setVisibility(View.GONE);
+                        }
+
+                        break;
+                    case "C":
+                        tv_status_info.setText("This session has ended and needs to be rated.");
+                        tv_status_info.setVisibility(View.VISIBLE);
+                        btn_action.setVisibility(View.GONE);
+                        break;
+                    case "R":
+                        tv_status_info.setText("This session has been rated");
+                        tv_status_info.setVisibility(View.VISIBLE);
+                        rbar_tutor.setVisibility(View.VISIBLE);
+                        rbar_tutor.setRating(session.getRating());
+                        rbar_tutor.setIsIndicator(true);
+                        btn_action.setVisibility(View.GONE);
+                }
+            }
+        }
+
     }
 
     private void setUpToolbar() {
@@ -134,16 +215,28 @@ public class RequestSessionActivity extends AppCompatActivity implements View.On
     }
 
     private void setupDateView() {
-        final Calendar calendar = Calendar.getInstance();
-        year_cur = calendar.get(Calendar.YEAR);
-        month_cur = calendar.get(Calendar.MONTH)+1;
-        day_cur = calendar.get(Calendar.DAY_OF_MONTH);
-        btn_date.setText(day_cur + "/" + month_cur + "/" + year_cur);
+        if (session_id == -1) {
+            final Calendar calendar = Calendar.getInstance();
+            year_cur = calendar.get(Calendar.YEAR);
+            month_cur = calendar.get(Calendar.MONTH)+1;
+            day_cur = calendar.get(Calendar.DAY_OF_MONTH);
+            btn_date.setText(day_cur + "/" + month_cur + "/" + year_cur);
+        } else {
+            String date = AppHelper.getDate(session.getStartTime());
+            btn_date.setText(date);
+        }
+
     }
 
     private void setUpTimeView() {
-        btn_start_time.setText("5:00 PM");
-        btn_end_time.setText("6:00 PM");
+        if (session_id == -1) {
+            btn_start_time.setText("5:00 PM");
+            btn_end_time.setText("6:00 PM");
+        } else {
+            btn_start_time.setText(AppHelper.getTime(session.getStartTime()));
+            btn_end_time.setText(AppHelper.getTime(session.getEndTime()));
+        }
+
     }
 
     private void setupProfileView() {
@@ -165,7 +258,12 @@ public class RequestSessionActivity extends AppCompatActivity implements View.On
     }
 
     private void setUpOtherUser() {
-        UserResponse.retrieveUserDetails(this, user_oth_id, user_cur.getUserId());
+        if (session_id == -1) {
+            UserResponse.retrieveUserDetails(this, user_oth_id, user_cur.getUserId());
+        } else {
+            onDetailsRetrieved(user_oth);
+        }
+
     }
 
     private void updateViewsWithOtherUser() {
@@ -252,6 +350,18 @@ public class RequestSessionActivity extends AppCompatActivity implements View.On
             performRelevantAction(v);
         }
 
+        if (id == R.id.lily_profile_cur) {
+            Bundle bundle = new Bundle();
+            bundle.putInt("userId", user_cur.getUserId());
+            AppHelper.slideInStayStill(this, ProfileActivity.class, bundle);
+        }
+
+        if (id == R.id.lily_profile_oth) {
+            Bundle bundle = new Bundle();
+            bundle.putInt("userId", user_oth.getUserId());
+            AppHelper.slideInStayStill(this, ProfileActivity.class, bundle);
+        }
+
 
     }
 
@@ -275,14 +385,28 @@ public class RequestSessionActivity extends AppCompatActivity implements View.On
     }
 
     private void performRelevantAction(View v) {
-        if (v.getTag() == "CREATE") {
+        if (v.getTag().equals("CREATE")) {
             studentId = user_cur.getUserId();
             tutorId = user_oth.getUserId();
             locationId = (int) spn_location.getSelectedItemId()+1;
             courseCode = spn_course.getSelectedItem().toString();
             SessionResponse.createSession(this, studentId, tutorId, locationId, courseCode, startTime, endTime, "CREATE");
         }
-        sendPushNotification();
+
+        if (v.getTag().equals("ACCEPT")) {
+            SessionResponse.acceptFinishSession(this, session_id, "ACCEPT");
+        }
+
+        if (v.getTag().equals("FINISH")) {
+            SessionResponse.acceptFinishSession(this, session_id, "FINISH");
+        }
+
+        if (v.getTag().equals("RATING")) {
+            if (rating > 0)
+                SessionResponse.rateSession(this, session_id, rating, session.getTutorId(), "RATE");
+            else
+                Toast.makeText(this, "Rating required to submit.", Toast.LENGTH_LONG).show();
+        }
     }
 
     private void sendPushNotification() {
@@ -382,25 +506,30 @@ public class RequestSessionActivity extends AppCompatActivity implements View.On
 
     @Override
     public void onSessionRetrieved(Session session) {
+        this.session_id = session.getSessionId();
         this.session = session;
-        if (session.getStudentid() == user_cur.getUserId()) {
-            user_oth_id = session.getTutorId();
-        } else {
-            user_oth_id = session.getStudentid();
-        }
-        instantiateViews();
+        user_oth = (session.getStudentId() == user_cur.getUserId()) ? session.getTutor(): session.getStudent();
+        is_student = (session.getStudentId() == user_cur.getUserId()) ? true : false;
         setUpViews();
-
     }
 
     @Override
     public void onSessionActionSuccess(Session session) {
-        Toast.makeText(this, "A request has been sent to the tutor.", Toast.LENGTH_LONG).show();
-        goBack();
+        this.session_id = session.getSessionId();
+        this.session = session;
+        user_oth = (session.getStudentId() == user_cur.getUserId()) ? session.getTutor(): session.getStudent();
+        is_student = (session.getStudentId() == user_cur.getUserId()) ? true : false;
+        setUpViews();
+        Log.d(LOG_TAG,"Session action success");
     }
 
     @Override
     public void onSessionFails(String message) {
         Toast.makeText(this, message, Toast.LENGTH_LONG).show();
+    }
+
+    @Override
+    public void onRatingChanged(RatingBar ratingBar, float rating, boolean b) {
+        this.rating = (int) rating;
     }
 }

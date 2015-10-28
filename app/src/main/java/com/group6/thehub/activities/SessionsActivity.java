@@ -58,10 +58,8 @@ public class SessionsActivity extends AppCompatActivity implements SessionRespon
         // as you specify a parent activity in AndroidManifest.xml.
         int id = item.getItemId();
 
-        //noinspection SimplifiableIfStatement
-        if (id == R.id.home) {
+        if (id == android.R.id.home) {
             goBack();
-            return true;
         }
 
         return super.onOptionsItemSelected(item);
@@ -70,6 +68,11 @@ public class SessionsActivity extends AppCompatActivity implements SessionRespon
     private void goBack() {
         finish();
         overridePendingTransition(0, R.anim.push_right_out);
+    }
+
+    @Override
+    public void onBackPressed() {
+        goBack();
     }
 
     @Override
@@ -94,7 +97,7 @@ public class SessionsActivity extends AppCompatActivity implements SessionRespon
     }
 
     private void loadDataIntoView() {
-        adapter = new SessionResultsAdapter(this, sessions);
+        adapter = new SessionResultsAdapter(this, sessions, user_cur.getUserId());
         rv_sessions.setAdapter(adapter);
     }
 }

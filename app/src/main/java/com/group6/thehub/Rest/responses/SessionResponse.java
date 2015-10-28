@@ -87,7 +87,7 @@ public class SessionResponse extends BaseResponse {
     public static void createSession(Context context, int studentId, int tutorId, int locationId, String courseCode, long startTime, long endTime, String action) {
 
         final ProgressDialog progress = new ProgressDialog(context);
-        progress.setMessage("Loading information. Please Wait");
+        progress.setMessage("Please Wait...");
         progress.setIndeterminate(true);
         progress.show();
         mListener = (SessionResponseListner) context;
@@ -95,6 +95,58 @@ public class SessionResponse extends BaseResponse {
         restClient.theHubApi.createSession(studentId, tutorId, locationId, courseCode, startTime, endTime, action, new Callback<SessionResponse>() {
             @Override
             public void success(SessionResponse sessionResponse, Response response) {
+                if (sessionResponse.getMeta().isSuccess()) {
+                    mListener.onSessionActionSuccess(sessionResponse.getSession());
+                } else {
+                    mListener.onSessionFails(sessionResponse.getMeta().getMessage());
+                }
+                progress.dismiss();
+            }
+
+            @Override
+            public void failure(RetrofitError error) {
+                progress.dismiss();
+            }
+        });
+    }
+
+    public static void acceptFinishSession(Context context, int sessionId, String action) {
+        final ProgressDialog progress = new ProgressDialog(context);
+        progress.setMessage("Please Wait...");
+        progress.setIndeterminate(true);
+        progress.show();
+        mListener = (SessionResponseListner) context;
+        RestClient restClient = new RestClient(context);
+        restClient.theHubApi.acceptFinishSession(sessionId, action, new Callback<SessionResponse>() {
+            @Override
+            public void success(SessionResponse sessionResponse, Response response) {
+
+                if (sessionResponse.getMeta().isSuccess()) {
+                    mListener.onSessionActionSuccess(sessionResponse.getSession());
+                } else {
+                    mListener.onSessionFails(sessionResponse.getMeta().getMessage());
+                }
+                progress.dismiss();
+            }
+
+            @Override
+            public void failure(RetrofitError error) {
+                progress.dismiss();
+            }
+        });
+    }
+
+    public static void rateSession(Context context, int sessionId, int rating, int tutorId, String action) {
+        final ProgressDialog progress = new ProgressDialog(context);
+        progress.setMessage("Please Wait...");
+        progress.setIndeterminate(true);
+        progress.show();
+        mListener = (SessionResponseListner) context;
+        RestClient restClient = new RestClient(context);
+        restClient.theHubApi.rateSession(sessionId, rating, tutorId, action, new Callback<SessionResponse>() {
+            @Override
+            public void success(SessionResponse sessionResponse, Response response) {
+
                 if (sessionResponse.getMeta().isSuccess()) {
                     mListener.onSessionActionSuccess(sessionResponse.getSession());
                 } else {

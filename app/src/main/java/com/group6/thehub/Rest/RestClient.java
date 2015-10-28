@@ -4,6 +4,8 @@ import android.content.Context;
 import android.support.annotation.NonNull;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
+import com.group6.thehub.AppHelper;
+
 import retrofit.RestAdapter;
 import retrofit.converter.GsonConverter;
 
@@ -19,7 +21,7 @@ public class RestClient {
 
     public final TheHubApi theHubApi;
 
-    private final String baseUrl = "http://10.19.90.100/";
+    private final String baseUrl = AppHelper.END_POINT;
 
     public RestClient(@NonNull Context context) {
         this.mContext = context.getApplicationContext();

@@ -29,10 +29,12 @@ public class SessionResultsAdapter extends RecyclerView.Adapter<SessionResultsAd
 
     Context mContext;
     List<Session> sessions;
+    int user_id_cur;
 
-    public SessionResultsAdapter(Context context, List<Session> sessions) {
+    public SessionResultsAdapter(Context context, List<Session> sessions, int user_id_cur) {
         this.mContext = context;
         this.sessions = sessions;
+        this.user_id_cur = user_id_cur;
     }
 
     @Override
@@ -44,14 +46,16 @@ public class SessionResultsAdapter extends RecyclerView.Adapter<SessionResultsAd
 
     @Override
     public void onBindViewHolder(SessionViewHolder holder, int position) {
+        Session session = sessions.get(position);
+        UserDetails user_oth = (user_id_cur == session.getStudentId()) ? session.getTutor() : session.getStudent();
         holder.setSession(sessions.get(position));
-        holder.tvUserName.setText(sessions.get(position).getName());
+        holder.tvUserName.setText(user_oth.getFullName());
         holder.tvRating.setVisibility(View.GONE);
         SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy");
         String date = sdf.format(new Date(sessions.get(position).getStartTime()*1000));
         holder.tvUserInfo.setText(sessions.get(position).getCourseCode()+" - "+date);
         Picasso.with(mContext)
-                .load(AppHelper.END_POINT+sessions.get(position).getImage().getImageUrl())
+                .load(AppHelper.END_POINT+user_oth.getImage().getImageUrl())
                 .placeholder(R.drawable.ic_account_circle_grey_48dp)
                 .error(R.drawable.ic_account_circle_grey_48dp)
                 .into(holder.imgUser);
