@@ -9,8 +9,11 @@ import android.support.v7.app.AppCompatActivity;
 import android.util.DisplayMetrics;
 import android.util.TypedValue;
 
+import com.parse.ParseCloud;
+
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.HashMap;
 
 /**
  * Created by sathwiksingari on 9/18/15.
@@ -88,5 +91,15 @@ public class AppHelper {
         SimpleDateFormat sdf = new SimpleDateFormat("hh:mm a");
         String time = sdf.format(new Date(epochTime*1000));
         return time;
+    }
+
+    public static void sendPushNotification(String channel, String message, String title, int sessionId) {
+
+        HashMap<String, Object> params = new HashMap<String, Object>();
+        params.put("channel", channel);
+        params.put("message", message);
+        params.put("title", title);
+        params.put("sessionId", sessionId);
+        ParseCloud.callFunctionInBackground("sendPush", params);
     }
 }

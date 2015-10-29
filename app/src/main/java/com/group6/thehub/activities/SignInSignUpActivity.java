@@ -10,13 +10,17 @@ import android.widget.Toast;
 
 import com.group6.thehub.AppHelper;
 import com.group6.thehub.R;
+import com.group6.thehub.Rest.models.Car;
 import com.group6.thehub.Rest.models.UserDetails;
 import com.group6.thehub.Rest.responses.UserResponse;
 import com.group6.thehub.fragments.SignInFragment;
 import com.group6.thehub.fragments.SignUpFragment;
+import com.parse.ParseCloud;
 import com.parse.ParseException;
 import com.parse.ParsePush;
 import com.parse.SaveCallback;
+
+import java.util.HashMap;
 
 public class SignInSignUpActivity extends AppCompatActivity implements SignInFragment.OnFragmentInteractionListener, SignUpFragment.OnFragmentInteractionListener, UserResponse.UserVerificationListener {
 
@@ -72,25 +76,17 @@ public class SignInSignUpActivity extends AppCompatActivity implements SignInFra
 
     @Override
     public void onRegistrationComplete(UserDetails userDetails) {
-        String email = userDetails.getEmail();
-        ParsePush.subscribeInBackground(email, new SaveCallback() {
-            @Override
-            public void done(ParseException e) {
-                Log.d("SignInActivity", "subscribed");
-            }
-        });
+        String channel = userDetails.getFirstName()+userDetails.getLastName()+userDetails.getUserId();
+        Log.d("SignInSignUpActivity", channel+" registered");
+        ParsePush.subscribeInBackground(channel);
         goToHome(userDetails);
     }
 
     @Override
     public void onSignInComplete(UserDetails userDetails) {
-        String channel = userDetails.getFullName()+""+userDetails.getUserId();
-        ParsePush.subscribeInBackground(channel, new SaveCallback() {
-            @Override
-            public void done(ParseException e) {
-                Log.d("SignInActivity", "subscribed");
-            }
-        });
+        String channel = userDetails.getFirstName()+userDetails.getLastName()+userDetails.getUserId();
+        Log.d("SignInSignUpActivity", channel + " logged in");
+        ParsePush.subscribeInBackground(channel);
         goToHome(userDetails);
     }
 

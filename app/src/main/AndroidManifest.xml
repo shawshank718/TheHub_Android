@@ -77,7 +77,7 @@
         <service android:name="com.parse.PushService" />
 
         <receiver
-            android:name="com.parse.ParsePushBroadcastReceiver"
+            android:name=".recievers.ParseReceiver"
             android:exported="false" >
             <intent-filter>
                 <action android:name="com.parse.push.intent.RECEIVE" />
@@ -99,7 +99,8 @@
 
         <activity
             android:name=".activities.SessionsActivity"
-            android:label="@string/title_activity_sessions" >
+            android:label="@string/title_activity_sessions"
+            android:screenOrientation="portrait">
         </activity>
     </application>
 

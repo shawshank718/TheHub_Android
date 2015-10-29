@@ -232,6 +232,10 @@ public class RequestSessionActivity extends AppCompatActivity implements View.On
         if (session_id == -1) {
             btn_start_time.setText("5:00 PM");
             btn_end_time.setText("6:00 PM");
+            String d = btn_date.getText().toString()+" "+btn_start_time.getText().toString();
+            startTime = convertToEpoch(d);
+            String e = btn_date.getText().toString()+" "+btn_end_time.getText().toString();
+            endTime = convertToEpoch(e);
         } else {
             btn_start_time.setText(AppHelper.getTime(session.getStartTime()));
             btn_end_time.setText(AppHelper.getTime(session.getEndTime()));
@@ -283,6 +287,9 @@ public class RequestSessionActivity extends AppCompatActivity implements View.On
         adapter_courses = new ArrayAdapter<String>(this, R.layout.spinner_item_general, courseCodes);
         adapter_courses.setDropDownViewResource(R.layout.spinner_item_general_dropdown);
         spn_course.setAdapter(adapter_courses);
+        if (session_id != -1) {
+            spn_course.setSelection(courseCodes.indexOf(session.getCourseCode()));
+        }
     }
 
     private void updateViewWithLocations() {
@@ -293,6 +300,9 @@ public class RequestSessionActivity extends AppCompatActivity implements View.On
         adapter_locations = new ArrayAdapter<String>(this, R.layout.spinner_item_general, locationNames);
         adapter_locations.setDropDownViewResource(R.layout.spinner_item_general_dropdown);
         spn_location.setAdapter(adapter_locations);
+        if (session_id != -1) {
+            spn_location.setSelection(session.getLocationId()-1);
+        }
     }
 
     @Override
@@ -390,6 +400,14 @@ public class RequestSessionActivity extends AppCompatActivity implements View.On
             tutorId = user_oth.getUserId();
             locationId = (int) spn_location.getSelectedItemId()+1;
             courseCode = spn_course.getSelectedItem().toString();
+            if (startTime < System.currentTimeMillis()/1000) {
+                Toast.makeText(this, "Start time cannot be in the past. please choose again.", Toast.LENGTH_LONG).show();
+                return;
+            }
+            if (startTime > endTime) {
+                Toast.makeText(this, "End time cannot be before start time. please choose again.", Toast.LENGTH_LONG).show();
+                return;
+            }
             SessionResponse.createSession(this, studentId, tutorId, locationId, courseCode, startTime, endTime, "CREATE");
         }
 
@@ -410,10 +428,34 @@ public class RequestSessionActivity extends AppCompatActivity implements View.On
     }
 
     private void sendPushNotification() {
-        ParsePush push = new ParsePush();
-        push.setChannel(user_oth.getEmail());
-        push.setMessage(user_cur+ " is requesting a session for the course "+spn_course.getSelectedItem().toString());
-        push.sendInBackground();
+        String status = session.getStatus();
+        String studentChannel = session.getStudent().getChannel();
+        String tutorChannel = session.getTutor().getChannel();
+        String message = "";
+        String title = "";
+        int sessionId = session.getSessionId();
+        switch (status) {
+            case "P":
+                title = "Request received! ";
+                message = " You have received a request from "+user_cur.getFullName();
+                AppHelper.sendPushNotification(tutorChannel, message, title, sessionId);
+                break;
+            case "A":
+                title = "Request accepted! ";
+                message = " "+user_cur.getFullName()+" has accepted your request.";
+                AppHelper.sendPushNotification(studentChannel, message, title, sessionId);
+                break;
+            case "C":
+                title = "Session finished! ";
+                message = " Your session with "+user_cur.getFullName()+" has ended. Rate this session to help the tutor.";
+                AppHelper.sendPushNotification(studentChannel, message, title, sessionId);
+                break;
+            case "R":
+                title = "Session rated! ";
+                message = " "+user_cur.getFullName()+" has rated you.";
+                AppHelper.sendPushNotification(tutorChannel, message, title, sessionId);
+                break;
+        }
     }
 
     @Override
@@ -461,7 +503,11 @@ public class RequestSessionActivity extends AppCompatActivity implements View.On
     @Override
     public void onDetailsRetrieved(UserDetails userDetails) {
         user_oth = userDetails;
-        this.courses = user_oth.getCourses();
+        if (is_student) {
+            this.courses = user_oth.getCourses();
+        } else {
+            this.courses = user_cur.getCourses();
+        }
         updateViewsWithOtherUser();
         updateViewWithCourses();
     }
@@ -519,6 +565,7 @@ public class RequestSessionActivity extends AppCompatActivity implements View.On
         this.session = session;
         user_oth = (session.getStudentId() == user_cur.getUserId()) ? session.getTutor(): session.getStudent();
         is_student = (session.getStudentId() == user_cur.getUserId()) ? true : false;
+        sendPushNotification();
         setUpViews();
         Log.d(LOG_TAG,"Session action success");
     }

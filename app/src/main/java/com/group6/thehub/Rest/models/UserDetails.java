@@ -1,14 +1,10 @@
 package com.group6.thehub.Rest.models;
 
-import org.parceler.Parcel;
-
 import java.util.ArrayList;
 
 /**
  * Created by sathwiksingari on 9/17/15.
  */
-
-@Parcel
 public class UserDetails {
 
     int userId;
@@ -38,7 +34,8 @@ public class UserDetails {
     }
 
 
-    public UserDetails() {
+    public UserDetails(String email) {
+        this.email = email;
     }
 
     public String getFirstName() {
@@ -115,5 +112,9 @@ public class UserDetails {
 
     public void setFavorite(boolean favorite) {
         this.favorite = favorite;
+    }
+
+    public String getChannel() {
+        return this.firstName+this.lastName+this.userId;
     }
 }

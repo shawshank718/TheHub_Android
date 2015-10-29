@@ -278,7 +278,7 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
 
             case R.id.logout:
                 UserResponse.callLogout(getApplicationContext());
-                ParsePush.unsubscribeInBackground(userDetails.getEmail());
+                ParsePush.unsubscribeInBackground(userDetails.getFirstName()+userDetails.getLastName()+userDetails.getUserId());
                 intent = new Intent(this, SignInSignUpActivity.class);
                 appHelper.slideDownPushDown(intent);
                 finish();
