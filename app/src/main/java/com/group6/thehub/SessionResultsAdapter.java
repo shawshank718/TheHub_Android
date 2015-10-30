@@ -75,6 +75,7 @@ public class SessionResultsAdapter extends RecyclerView.Adapter<SessionResultsAd
                 .placeholder(R.drawable.ic_account_circle_grey_48dp)
                 .error(R.drawable.ic_account_circle_grey_48dp)
                 .into(holder.imgUser);
+        //
     }
 
     @Override
