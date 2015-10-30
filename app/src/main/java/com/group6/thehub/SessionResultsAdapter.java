@@ -53,7 +53,23 @@ public class SessionResultsAdapter extends RecyclerView.Adapter<SessionResultsAd
         holder.tvRating.setVisibility(View.GONE);
         SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy");
         String date = sdf.format(new Date(sessions.get(position).getStartTime()*1000));
-        holder.tvUserInfo.setText(sessions.get(position).getCourseCode()+" - "+date);
+        String status = "";
+        String s = session.getStatus();
+        switch (s) {
+            case "P":
+                status = "Pending";
+                break;
+            case "A":
+                status = "Accepted";
+                break;
+            case "C":
+                status = "Needs Rating";
+                break;
+            case "R":
+                status = "Finished";
+                break;
+        }
+        holder.tvUserInfo.setText(sessions.get(position).getCourseCode()+" - "+date+" - "+status);
         Picasso.with(mContext)
                 .load(AppHelper.END_POINT+user_oth.getImage().getImageUrl())
                 .placeholder(R.drawable.ic_account_circle_grey_48dp)

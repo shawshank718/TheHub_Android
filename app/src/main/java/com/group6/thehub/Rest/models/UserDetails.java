@@ -26,7 +26,11 @@ public class UserDetails {
     boolean favorite;
 
     public String getPhone() {
-        return phone.replace("a","");
+        if (phone != null) {
+            return phone.replace("a","");
+        } else {
+            return "";
+        }
     }
 
     public int getUserId() {

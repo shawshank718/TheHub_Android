@@ -27,7 +27,7 @@ public class AppHelper {
 
     private static final String USER_PREFS = "com.group6.thehub.user_prefs";
 
-    public static final String END_POINT = "http://192.168.137.249/"; //"http://10.19.90.100/";
+    public static final String END_POINT = "http://10.19.93.185/";   //192.168.137.249/"; //"http://10.19.90.100/";
 
     public AppHelper(Context mContext) {
         this.mContext = mContext;
